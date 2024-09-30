@@ -37,6 +37,7 @@ exports.singin = catchAsync(async (req, res, next) => {
   }
   // get user
   const user = await User.findOne({ maSo }).select('+password');
+  console.log(await User.find(), user, maSo, password);
   const correct = user && (await user.correctPassword(password, user.password));
   if (!correct) {
     return next(new ApiError('Mã số hoặc mật khẩu không đúng', 401));

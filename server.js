@@ -13,12 +13,14 @@ const Message = require('./model/ChatModel'); // Assuming chat model is saved in
 const server = http.createServer(app); // Create HTTP server
 const io = socketio(server, {
   cors: {
-    origin: 'http://localhost:5173', // Allow your frontend URL
+    origin: [
+      'http://localhost:5173',
+      'https://main--khoaluantotnghiep.netlify.app',
+    ], // Allow both frontend URLs
     methods: ['GET', 'POST'],
     credentials: true, // If you're using cookies for sessions
   },
 });
-
 const DB = process.env.DATABASE;
 mongoose.connect(DB).then(() => {
   console.log('DB connection successful');

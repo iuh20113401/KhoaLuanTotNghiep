@@ -38,7 +38,10 @@ app.use(cors()); // Enable CORS for all routes
 // Or specify the allowed origins
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Replace with your front-end URL
+    origin: [
+      'http://localhost:5173',
+      'https://main--khoaluantotnghiep.netlify.app',
+    ], // Allow both front-end URLs
     credentials: true, // If you're sending cookies
   }),
 );
