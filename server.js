@@ -5,8 +5,9 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 dotenv.config({ path: './config.env' });
-
 const app = require('./index');
+
+app.set('trust proxy', 1);
 const Message = require('./model/ChatModel'); // Assuming chat model is saved in models/chatModel.js
 
 const server = http.createServer(app); // Create HTTP server
