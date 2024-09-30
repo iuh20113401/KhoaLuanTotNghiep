@@ -1,10 +1,10 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
-const dotenv = require('dotenv');
+// const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
-dotenv.config({ path: './config.env' });
+// dotenv.config({ path: './config.env' });
 
 const app = require('./index');
 const Message = require('./model/ChatModel'); // Assuming chat model is saved in models/chatModel.js
