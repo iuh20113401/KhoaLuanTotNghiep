@@ -51,13 +51,7 @@ exports.singin = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.logout = catchAsync((req, res) => {
-  // // Clear the cookie by setting an expired date in the past
-  // res.cookie('jwt', 'loggedout', {
-  //   expires: new Date(Date.now() + 10 * 1000), // Expire after 10 seconds
-  //   httpOnly: true,
-  // });
-
+exports.logout = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: { message: 'You have been logged out successfully!' },
