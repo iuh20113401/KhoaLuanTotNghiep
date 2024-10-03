@@ -91,7 +91,6 @@ function convertDate(dateStr) {
 // Your insertMany function (with Multer file upload handling)
 exports.insertMany = catchAsync(async (req, res, next) => {
   upload(req, res, async (err) => {
-    console.log(req.file);
     if (err) {
       return res.status(400).json({ error: err.message });
     }
