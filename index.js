@@ -87,7 +87,7 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); // add attribute date to request object
   next();
 });
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 // use Router
 app.use('/api/user', userRouter);
 app.use('/api/deTai', deTaiRouter);
