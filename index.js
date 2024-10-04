@@ -39,6 +39,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   'http://localhost:5173',
   'https://main--khoaluantotnghiep.netlify.app',
+  'https://khoaluantotnghiep.netlify.app',
 ];
 
 app.use(
