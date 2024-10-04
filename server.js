@@ -11,14 +11,22 @@ app.set('trust proxy', 1);
 const Message = require('./model/ChatModel'); // Assuming chat model is saved in models/chatModel.js
 
 const server = http.createServer(app); // Create HTTP server
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://main--khoaluantotnghiep.netlify.app',
+  'https://khoaluantotnghiep.netlify.app',
+];
 const io = socketio(server, {
   cors: {
-    origin: [
-      'http://localhost:5173',
-      'https://main--khoaluantotnghiep.netlify.app',
-    ], // Allow both frontend URLs
-    methods: ['GET', 'POST'],
-    credentials: true, // If you're using cookies for sessions
+    origin: (origin, callback) => {
+      // Check if the request's origin is allowed
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin); // Allow the origin
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Enable cookies and credentials to be sent
   },
 });
 
