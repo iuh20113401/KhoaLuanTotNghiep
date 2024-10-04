@@ -21,6 +21,7 @@ const io = socketio(server, {
     credentials: true, // If you're using cookies for sessions
   },
 });
+
 const DB = process.env.DATABASE;
 mongoose.connect(DB).then(() => {
   console.log('DB connection successful');

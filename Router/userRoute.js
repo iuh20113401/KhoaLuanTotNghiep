@@ -4,7 +4,7 @@ const authController = require('../controller/authController');
 
 const userRouter = express.Router();
 
-userRouter.route('/singin').post(authController.singin);
+userRouter.route('/login').post(authController.login);
 userRouter.route('/logout').get(authController.logout);
 userRouter.use(authController.protect);
 userRouter.route('/NhieuUser').post(userController.insertMany);

@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const userRouter = require('./Router/userRoute');
@@ -32,19 +33,28 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   message: 'Too many request. Please try again in an hour.',
 });
-
-app.use(cors()); // Enable CORS for all routes
+app.use(cookieParser());
 
 // Or specify the allowed origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://main--khoaluantotnghiep.netlify.app',
+];
+
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'https://main--khoaluantotnghiep.netlify.app',
-    ], // Allow both front-end URLs
-    credentials: true, // If you're sending cookies
+    origin: (origin, callback) => {
+      // Check if the request's origin is allowed
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin); // Allow the origin
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Enable cookies and credentials to be sent
   }),
 );
+
 // middleware for request and response
 app.use(express.json({ limit: '15kb' })); // will modify data in request as json format
 
