@@ -261,7 +261,6 @@ async function layDanhSachTroTruyenGiangVien(id) {
     {
       $match: {
         _id: id,
-        vaiTro: 1, // Matching only lecturers (vaiTro = 1)
       },
     },
     {

@@ -207,6 +207,7 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
         _id: '$_id',
         maDoAn: { $first: '$maDoAn' },
         tenDoAn: { $first: '$tenDoAn' },
+        trangThai: { $first: '$trangThai' },
         user1Info: { $first: '$user1Info' },
         sinhVien1Info: { $first: '$sinhVien1Info' },
         user2Info: { $first: '$user2Info' },
@@ -232,6 +233,7 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
         _id: 1,
         maDoAn: 1,
         tenDoAn: 1,
+        trangThai: 1,
         sinhVien: [
           {
             maSo: '$user1Info.maSo',
@@ -535,7 +537,7 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
   });
 });
 exports.getDanhSachDoAnDat = catchAsync(async (req, res, next) => {
-  const doAnList = await doAn.find({ trangThai: { $in: [1, 6] } }).populate({
+  const doAnList = await doAn.find({ trangThai: { $in: [2, 7] } }).populate({
     path: 'sinhVien1 sinhVien2 giangVien',
     select: 'maSo hoTen email lop',
   });
