@@ -5,6 +5,19 @@ const thucTapSchema = mongoose.Schema(
   {
     userId: { type: mongoose.Schema.ObjectId, ref: 'users' },
     giangVien: { type: mongoose.Schema.ObjectId, ref: 'users' },
+    hocKy: {
+      type: Number,
+      enum: [1, 2],
+    },
+    namHoc: {
+      type: String,
+      validate: {
+        validator: function (val) {
+          return /^\d{4}-\d{4}$/.test(val);
+        },
+        message: 'Năm học phải có định dạng YYYY-YYYY',
+      },
+    },
     trangThaiThucTap: { type: Number, default: 0 },
     tenCongTy: {
       type: String,

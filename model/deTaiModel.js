@@ -4,7 +4,7 @@ const deTaiSchema = mongoose.Schema({
   tenDeTai: {
     type: String,
     trim: true,
-    requrie: [true, 'Vui lòng nhập tên đề tài '],
+    required: [true, 'Vui lòng nhập tên đề tài '],
   },
   giangVien: {
     type: mongoose.Schema.ObjectId,

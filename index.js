@@ -23,6 +23,7 @@ const thongBaoRouter = require('./Router/thongBaoRouter');
 const lichHopRouter = require('./Router/LichHopRouter');
 const thucTapRouter = require('./Router/ThucTapRouter');
 const dashboardRouter = require('./Router/DashboardRoute');
+const caiDatRouter = require('./Router/caiDatRouter');
 
 // app.use(express.static(${__dirname}/public));
 app.use(express.static(path.join(__dirname, '/public')));
@@ -101,6 +102,7 @@ app.use('/api/chat', chatRouter);
 app.use('/api/thongBao', thongBaoRouter);
 app.use('/api/lichHop', lichHopRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/caiDat', caiDatRouter);
 
 app.use(errorController);
 module.exports = app;

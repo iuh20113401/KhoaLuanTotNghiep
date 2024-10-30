@@ -1,3 +1,4 @@
+const caiDat = require('../model/CaiDatModel');
 const ApiError = require('../utils/ApiError');
 const APIFeature = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
@@ -60,7 +61,12 @@ exports.getOne = (Model, populateOptions) =>
   });
 exports.getAll = (Model, populateOptions) =>
   catchAsync(async (req, res) => {
-    const feature = new APIFeature(Model.find(), req.query)
+    let { namHoc, hocKy } = req.query;
+    if (!namHoc && !hocKy) {
+      const caiDatInfo = await caiDat.find();
+      [{ namHoc, hocKy }] = caiDatInfo;
+    }
+    const feature = new APIFeature(Model.find({ namHoc, hocKy }), req.query)
       .filter()
       .sort()
       .fields()

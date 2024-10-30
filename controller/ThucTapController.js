@@ -4,17 +4,80 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const Factory = require('./handlerFactory');
 const { upload } = require('./uploadController');
+const caiDat = require('../model/CaiDatModel');
 
-exports.getAllThucTap = Factory.getAll(ThucTap, [
-  {
-    path: 'userId',
-    select: 'maSo hoTen hinhAnh email soDienThoai',
-  },
-  {
-    path: 'giangVien',
-    select: 'maSo hoTen hinhAnh email soDienThoai',
-  },
-]);
+exports.getAllThucTap = catchAsync(async (req, res, next) => {
+  let { namHoc, hocKy } = req.query;
+  if (!namHoc && !hocKy) {
+    const caiDatInfo = await caiDat.find();
+    [{ namHoc, hocKy }] = caiDatInfo;
+  }
+  hocKy = parseInt(hocKy, 10);
+  const results = await ThucTap.aggregate([
+    {
+      // Join với bảng User để lấy thông tin sinhVien1
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'userInfo',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              hoTen: 1,
+              email: 1,
+              soDienThoai: 1,
+              maSo: 1,
+              lop: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      // Unwind để xử lý mảng sinhVien1Info
+      $unwind: '$userInfo',
+    },
+    {
+      // Join với bảng User để lấy thông tin sinhVien1
+      $lookup: {
+        from: 'sinhviens',
+        localField: 'userInfo._id',
+        foreignField: 'userId',
+        as: 'sinhVienInfo',
+      },
+    },
+    {
+      // Unwind để xử lý mảng sinhVien1Info
+      $unwind: '$sinhVienInfo',
+    },
+    { $match: { namHoc, hocKy } },
+    {
+      $project: {
+        _id: 1,
+        'sinhVienInfo._id': 1,
+        maDoAn: 1,
+        tenDoAn: 1,
+        'sinhVienInfo.diem.diemThucTap': 1,
+        userInfo: 1,
+        tenCongTy: 1,
+        diaChiCongTy: 1,
+        emailCongTy: 1,
+        tenNguoiDaiDien: 1,
+        tenNguoiGiamSat: 1,
+        soDienThoaiNguoiGiamSat: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      results,
+    },
+  });
+});
 exports.getThucTap = Factory.getOne(ThucTap, [
   {
     path: 'userId',
@@ -93,6 +156,12 @@ exports.taiTaiLieu = catchAsync(async (req, res, next) => {
   });
 });
 exports.getDanhSachThucTapTheoGiangVien = catchAsync(async (req, res, next) => {
+  let { namHoc, hocKy } = req.query;
+  if (!namHoc && !hocKy) {
+    const caiDatInfo = await caiDat.find();
+    [{ namHoc, hocKy }] = caiDatInfo;
+  }
+  hocKy = parseInt(hocKy, 10);
   const result = await ThucTap.aggregate([
     {
       // Join với bảng User để lấy thông tin sinhVien1
@@ -136,8 +205,11 @@ exports.getDanhSachThucTapTheoGiangVien = catchAsync(async (req, res, next) => {
       // Lọc các kết quả dựa trên ID giảng viên
       $match: {
         giangVien: req.user._id,
+        namHoc,
+        hocKy,
       },
     },
+
     {
       $project: {
         _id: 1,

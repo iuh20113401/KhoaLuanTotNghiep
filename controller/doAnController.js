@@ -8,6 +8,7 @@ const Factory = require('./handlerFactory');
 const fieldObj = require('../utils/filterObj');
 const { upload } = require('./uploadController');
 const SinhVien = require('../model/sinhVien');
+const caiDat = require('../model/CaiDatModel');
 
 exports.updateDoAn = Factory.updateOne(doAn);
 exports.getAllDoAn = Factory.getAll(doAn, [
@@ -74,6 +75,9 @@ exports.getDoAn = Factory.getOne(doAn, [
 exports.deleteDoAn = Factory.deleteOne(doAn);
 
 exports.taoDoAn = catchAsync(async (req, res, next) => {
+  let caiDatInfo = await caiDat.find();
+  caiDatInfo = caiDatInfo[0];
+  console.log(caiDatInfo);
   const result = await doAn.create({ ...req.body, sinhVien1: req.user._id });
   res.status(201).json({
     status: 'success',
@@ -123,7 +127,13 @@ exports.themComment = catchAsync(async (req, res, next) => {
 });
 
 exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
-  const result = await doAn.aggregate([
+  let { namHoc, hocKy } = req.query;
+  if (!namHoc && !hocKy) {
+    const caiDatInfo = await caiDat.find();
+    [{ namHoc, hocKy }] = caiDatInfo;
+  }
+  hocKy = parseInt(hocKy, 10);
+  const results = await doAn.aggregate([
     {
       // Join với bảng User để lấy thông tin sinhVien1
       $lookup: {
@@ -199,6 +209,8 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
       // Lọc các kết quả dựa trên ID giảng viên
       $match: {
         'deTaiInfo.giangVien': req.user._id,
+        namHoc,
+        hocKy,
       },
     },
     {
@@ -234,26 +246,34 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
         maDoAn: 1,
         tenDoAn: 1,
         trangThai: 1,
-        sinhVien: [
-          {
-            maSo: '$user1Info.maSo',
-            hoTen: '$user1Info.hoTen',
-            sinhVienId: '$sinhVien1Info._id',
-            diem: '$sinhVien1Info.diem',
-          },
-          {
-            $cond: {
-              if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
-              then: {
-                maSo: '$user2Info.maSo',
-                hoTen: '$user2Info.hoTen',
-                sinhVienId: '$sinhVien2Info._id',
-                diem: '$sinhVien2Info.diem',
-              },
-              else: '$$REMOVE', // Exclude from the result if it's null
+        sinhVien1Info: {
+          sinhVienId: '$sinhVien1Info._id',
+          diem: '$sinhVien1Info.diem',
+        },
+        sinhVien1: {
+          maSo: '$user1Info.maSo',
+          hoTen: '$user1Info.hoTen',
+        },
+        sinhVien2: {
+          $cond: {
+            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            then: {
+              maSo: '$user2Info.maSo',
+              hoTen: '$user2Info.hoTen',
             },
+            else: '$$REMOVE',
           },
-        ],
+        },
+        sinhVien2Info: {
+          $cond: {
+            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            then: {
+              sinhVienId: '$sinhVien2Info._id',
+              diem: '$sinhVien2Info.diem',
+            },
+            else: '$$REMOVE', // Exclude from the result if it's null
+          },
+        },
         huongDan: 1,
         totalHuongDan: 1,
         completedHuongDan: 1,
@@ -276,13 +296,13 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      result,
+      results,
     },
   });
 });
 
 exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
-  const result = await doAn.aggregate([
+  const results = await doAn.aggregate([
     {
       $lookup: {
         from: 'users',
@@ -397,7 +417,7 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      result,
+      results,
     },
   });
 });

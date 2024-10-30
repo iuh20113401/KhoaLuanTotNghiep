@@ -4,6 +4,7 @@ const user = require('../model/userModel');
 const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/ApiError');
 const doAn = require('../model/doAnModel');
+const caiDat = require('../model/CaiDatModel');
 
 exports.getAllSinhVien = Factory.getAll(SinhVien);
 
@@ -104,6 +105,11 @@ exports.updateDiemThucTap = catchAsync(async (req, res, next) => {
   });
 });
 exports.getSinhVienDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
+  let { namHoc, hocKy } = req.query;
+  if (!namHoc && !hocKy) {
+    const caiDatInfo = await caiDat.find();
+    [{ namHoc, hocKy }] = caiDatInfo;
+  }
   const results = await SinhVien.aggregate([
     {
       $lookup: {
@@ -146,6 +152,8 @@ exports.getSinhVienDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
     {
       $match: {
         'doAnInfo.giangVien': req.user._id,
+        'doAnInfo.namHoc': namHoc,
+        'doAnInfo.hocKy': hocKy,
       },
     },
     {

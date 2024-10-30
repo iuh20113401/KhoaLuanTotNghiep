@@ -61,6 +61,19 @@ const doAnSchema = mongoose.Schema(
         noiDung: String,
       },
     ],
+    hocKy: {
+      type: Number,
+      enum: [1, 2],
+    },
+    namHoc: {
+      type: String,
+      validate: {
+        validator: function (val) {
+          return /^\d{4}-\d{4}$/.test(val);
+        },
+        message: 'Năm học phải có định dạng YYYY-YYYY',
+      },
+    },
     huongDan: [
       {
         type: String,
@@ -128,7 +141,7 @@ doAnSchema.virtual('sinhVien2Info', {
   justOne: true,
 });
 doAnSchema.pre('find', function (next) {
-  this.wasNew = this.isNew; // Capture if it's new before saving
+  this.wasNew = this.isNew;
   next();
 });
 doAnSchema.pre('save', function (next) {
@@ -150,7 +163,6 @@ doAnSchema.post('save', async function () {
       },
     );
   } else if (!this.wasNew) {
-    // Handle updates if needed
     console.log('Document was updated');
   }
 });
