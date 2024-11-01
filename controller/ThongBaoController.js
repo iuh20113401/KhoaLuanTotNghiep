@@ -9,11 +9,9 @@ exports.getAllThongBao = catchAsync(async (req, res) => {
 
   let queryStr = { $in: null };
   queryStr.$in = loai.in;
-  console.log(queryStr, queryStr.$in);
 
   queryStr = queryStr.$in.replace(/[[\]]/g, '').split(',').map(Number);
 
-  console.log(queryStr);
   const data = await ThongBao.find({
     loai: queryStr,
     tieuDe: { $ne: 'Kế hoạch thực hiện' },
