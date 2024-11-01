@@ -4,7 +4,25 @@ const catchAsync = require('../utils/catchAsync');
 const Factory = require('./handlerFactory');
 const { uploadHinhAnh } = require('./uploadController');
 
-exports.getAllThongBao = Factory.getAll(ThongBao);
+exports.getAllThongBao = catchAsync(async (req, res) => {
+  const { loai } = req.query;
+
+  let queryStr = { $in: null };
+  queryStr.$in = loai.in;
+  console.log(queryStr, queryStr.$in);
+
+  queryStr = queryStr.$in.replace(/[[\]]/g, '').split(',').map(Number);
+
+  console.log(queryStr);
+  const data = await ThongBao.find({
+    loai: queryStr,
+    tieuDe: { $ne: 'Kế hoạch thực hiện' },
+  });
+  res.status(201).json({
+    status: 'success',
+    data: { data },
+  });
+});
 exports.getThongBao = Factory.getOne(ThongBao);
 exports.deleteThongBao = Factory.deleteOne(ThongBao);
 exports.updateThongBao = Factory.updateOne(ThongBao);
