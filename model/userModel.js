@@ -104,6 +104,7 @@ userSchema.post('bulkWrite', async (docs, next) => {
       return { userId };
     })
     .filter(Boolean);
+  sinhVienDocs.diem.diemPhanBien = { diemPhanBien1: null, diemPhanBien2: null };
   console.log(sinhVienDocs);
   if (sinhVienDocs.length > 0) {
     await SinhVien.insertMany(sinhVienDocs);

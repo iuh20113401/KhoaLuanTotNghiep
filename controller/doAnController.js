@@ -377,26 +377,34 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
         _id: 1,
         maDoAn: 1,
         tenDoAn: 1,
-        sinhVien: [
-          {
-            maSo: '$user1Info.maSo',
-            hoTen: '$user1Info.hoTen',
-            sinhVienId: '$sinhVien1Info._id',
-            diem: '$sinhVien1Info.diem',
-          },
-          {
-            $cond: {
-              if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
-              then: {
-                maSo: '$user2Info.maSo',
-                hoTen: '$user2Info.hoTen',
-                sinhVienId: '$sinhVien2Info._id',
-                diem: '$sinhVien2Info.diem',
-              },
-              else: '$$REMOVE', // Exclude from the result if it's null
+        sinhVien1Info: {
+          sinhVienId: '$sinhVien1Info._id',
+          diem: '$sinhVien1Info.diem',
+        },
+        sinhVien1: {
+          maSo: '$user1Info.maSo',
+          hoTen: '$user1Info.hoTen',
+        },
+        sinhVien2: {
+          $cond: {
+            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            then: {
+              maSo: '$user2Info.maSo',
+              hoTen: '$user2Info.hoTen',
             },
+            else: '$$REMOVE',
           },
-        ],
+        },
+        sinhVien2Info: {
+          $cond: {
+            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            then: {
+              sinhVienId: '$sinhVien2Info._id',
+              diem: '$sinhVien2Info.diem',
+            },
+            else: '$$REMOVE', // Exclude from the result if it's null
+          },
+        },
         giangVienPhanBien: {
           $cond: {
             if: { $eq: ['$giangVienPhanBien1', req.user._id] },
