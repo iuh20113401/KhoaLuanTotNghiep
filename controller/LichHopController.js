@@ -35,9 +35,10 @@ exports.getLichHopChoSinhVien = catchAsync(async (req, res, next) => {
   const doAnDetails = await DoAn.findById(doAn).populate('giangVien');
 
   const thucTapDetails = await ThucTap.findById(thucTap).populate('giangVien');
+
   const lichHop = await LichHop.find({
     giangVien: {
-      $in: [doAnDetails?.giangVien._id, thucTapDetails?.giangVien._id],
+      $in: [doAnDetails?.giangVien?._id, thucTapDetails?.giangVien?._id],
     },
   }).populate('giangVien');
 
