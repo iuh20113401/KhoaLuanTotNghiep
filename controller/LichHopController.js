@@ -14,7 +14,7 @@ exports.updateLichHop = Factory.updateOne(LichHop);
 
 exports.getLichHopThuocGiangVien = catchAsync(async (req, res, next) => {
   const danhSachLichHop = await LichHop.find({
-    giangVien: req.params._id,
+    giangVien: req.params.id,
   });
 
   res.status(200).json({
@@ -24,28 +24,25 @@ exports.getLichHopThuocGiangVien = catchAsync(async (req, res, next) => {
 });
 
 exports.getLichHopChoSinhVien = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
-  const sinhVien = await SinhVien.findOne({ userId });
+  const { id } = req.params;
+  const sinhVien = await SinhVien.findOne({ userId: id });
 
   if (!sinhVien) {
     next(new ApiError('Không thể tìm thấy mã người dùng này', 400));
   }
-
-  // Lấy đồ án và thực tập
   const { doAn, thucTap } = sinhVien;
 
-  // Lấy giảng viên hướng dẫn từ đồ án
   const doAnDetails = await DoAn.findById(doAn).populate('giangVien');
 
-  // Lấy giảng viên hướng dẫn từ thực tập
   const thucTapDetails = await ThucTap.findById(thucTap).populate('giangVien');
-
-  // Lấy lịch họp của cả giảng viên đồ án và thực tập
   const lichHop = await LichHop.find({
     giangVien: {
-      $in: [doAnDetails.giangVien._id, thucTapDetails.giangVien._id],
+      $in: [doAnDetails?.giangVien._id, thucTapDetails?.giangVien._id],
     },
-  }).populate({ path: 'giangVien' });
+  }).populate('giangVien');
 
-  return lichHop;
+  res.status(200).json({
+    status: 'success',
+    data: { danhSachLichHop: lichHop },
+  });
 });

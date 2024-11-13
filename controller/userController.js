@@ -210,7 +210,7 @@ async function layDanhSachTroTruyenSinhVien(id) {
                   { $eq: ['$_id', '$$giangVienPhanBien2'] },
                   { $eq: ['$_id', '$$sinhVien1'] },
                   { $eq: ['$_id', '$$sinhVien2'] },
-                  { $eq: ['$_id', '$$giangVienThucTap'] }, // Include giangVienThucTap
+                  { $eq: ['$_id', '$$giangVienThucTap'] },
                 ],
               },
             },
@@ -250,8 +250,10 @@ async function layDanhSachTroTruyenSinhVien(id) {
         soDienThoai: 1,
         maSo: 1,
         hinhAnh: 1,
+        vaiTro: 1,
       },
     },
+    { $sort: { maSo: 1 } },
   ]);
   return [...danhSach.filter((user) => user._id.toString() !== id.toString())];
 }
@@ -358,8 +360,9 @@ async function layDanhSachTroTruyenGiangVien(id) {
         vaiTro: 1,
       },
     },
+    { $sort: { maSo: 1 } },
   ]);
-  return danhSach; // The list of unique students
+  return danhSach;
 }
 
 exports.layDanhSachTroChuyen = catchAsync(async (req, res, next) => {

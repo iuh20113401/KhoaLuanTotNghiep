@@ -9,7 +9,10 @@ const lichHopSchema = mongoose.Schema({
     type: String,
     trim: true,
   },
-  giangVien: Number,
+  giangVien: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users',
+  },
   batDau: { type: Date, default: Date.now() },
   ketThuc: { type: Date, default: Date.now() },
 });

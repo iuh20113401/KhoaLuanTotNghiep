@@ -15,17 +15,17 @@ exports.xoaTrangThai = catchAsync(async (req, res, next) => {
   next();
 });
 exports.taoDeTai = catchAsync(async (req, res) => {
-  const newTour = await deTai.create({ ...req.body, giangVien: req.user });
+  const newDeTai = await deTai.create({ ...req.body, giangVien: req.user });
   res.status(201).json({
     status: 'success',
-    data: { tour: newTour },
+    data: { deTai: newDeTai },
   });
 });
 exports.getAllDeTaiTheoGiangVien = catchAsync(async (req, res, next) => {
   const deTais = await deTai.find({ giangVien: req.user._id });
   res.status(200).json({
     status: 'success',
-    data: { deTai: deTais },
+    data: { DanhSachDeTai: deTais },
   });
 });
 exports.getDanhMucDeTai = catchAsync(async (req, res, next) => {

@@ -15,6 +15,14 @@
     "class-methods-use-this": "off",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
     "no-unused-vars": ["warn", { "argsIgnorePattern": "req|res|next|val" }],
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true,
+        "allowTernary": true,
+        "allowTaggedTemplates": true
+      }
+    ],
     "node/no-unsupported-features/es-syntax": [
       "error",
       {
