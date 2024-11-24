@@ -58,14 +58,21 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     trim: true,
-    requiredd: [true, 'A user must have email'],
-    validate: [validator.isEmail, 'Please provide a valid email'],
     lowercase: true,
+    default: null,
   },
   soDienThoai: {
     type: String,
   },
   hinhAnh: {
+    type: String,
+    trim: true,
+  },
+  hocKy: {
+    type: Number,
+    trim: true,
+  },
+  namHoc: {
     type: String,
     trim: true,
   },
@@ -94,19 +101,38 @@ userSchema.pre('save', async function (next) {
   this.passwordChangeDate = Date.now() - 1000;
   next();
 });
-
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword,
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 //crate sinh vien
 userSchema.post('bulkWrite', async (docs, next) => {
-  const sinhVienDocs = Object.keys(docs.upsertedIds)
+  let sinhVienDocs = Object.keys(docs.upsertedIds)
     .map((key) => {
       const userId = docs.upsertedIds[key]; // Get the user ID of the upserted record
 
       return { userId };
     })
     .filter(Boolean);
-  sinhVienDocs.diem.diemPhanBien = { diemPhanBien1: null, diemPhanBien2: null };
-  console.log(sinhVienDocs);
+
   if (sinhVienDocs.length > 0) {
+    sinhVienDocs = sinhVienDocs.map((sv) => ({
+      ...sv,
+      diem: {
+        diemHuongDan: null,
+        diemPhanBien: {
+          diemPhanBien1: null,
+          diemPhanBien2: null,
+        },
+        diemHoiDong: null,
+        diemThucTap: {
+          diemGiangVien: null,
+          diemDoanhNghiep: null,
+        },
+      },
+    }));
     await SinhVien.insertMany(sinhVienDocs);
   }
 
@@ -122,12 +148,6 @@ userSchema.post('save', async (doc, next) => {
   next();
 });
 
-userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword,
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-};
 userSchema.methods.changePasswordAfter = function (JWTTimeStamps) {
   if (this.passwordChangeDate) {
     const changeDate = this.passwordChangeDate.getTime() / 1000;

@@ -8,9 +8,9 @@ dotenv.config({ path: './config.env' });
 const app = require('./index');
 
 app.set('trust proxy', 1);
-const Message = require('./model/ChatModel'); // Assuming chat model is saved in models/chatModel.js
+const Message = require('./model/ChatModel');
 
-const server = http.createServer(app); // Create HTTP server
+const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'https://main--khoaluantotnghiep.netlify.app',
@@ -19,14 +19,13 @@ const allowedOrigins = [
 const io = socketio(server, {
   cors: {
     origin: (origin, callback) => {
-      // Check if the request's origin is allowed
       if (allowedOrigins.includes(origin)) {
-        callback(null, origin); // Allow the origin
+        callback(null, origin);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true, // Enable cookies and credentials to be sent
+    credentials: true,
   },
 });
 
@@ -45,14 +44,11 @@ server.listen(port, () => {
 io.on('connection', (socket) => {
   console.log('New connection established');
 
-  // Listen for a join event from the client to create or join a chat room
   socket.on('joinRoom', ({ userId, partnerId }) => {
-    // Create a unique room for the two users
     const roomId = [userId, partnerId].sort().join('_');
     socket.join(roomId);
     console.log(`User ${userId} joined room ${roomId}`);
 
-    // Send a welcome message or existing messages
     Message.find({ chatRoom: roomId }).then((messages) => {
       socket.emit('loadMessages', messages);
     });
@@ -73,7 +69,6 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });

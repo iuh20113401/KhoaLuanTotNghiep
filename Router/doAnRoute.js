@@ -13,11 +13,11 @@ doAnRouter
   .get(doAnController.getDanhSachDoAnTheoGiangVien);
 
 doAnRouter
-  .route('/doAnDat')
-  .get(doAnController.getDanhSachDoAnDat)
+  .route('/DanhSachDoAn/DatCuoiKy')
+  .get(doAnController.getDanhSachDoAnDatCuoiKy)
   .post(doAnController.themNhieuGiangVienPhanBien);
 doAnRouter
-  .route('/DanhSachDoAnDatPhanBien')
+  .route('/DanhSachDoAn/DatPhanBien')
   .get(doAnController.getDanhSachDoAnDatPhanBien)
   .post(doAnController.themNhieuGiangVienHoiDong);
 doAnRouter

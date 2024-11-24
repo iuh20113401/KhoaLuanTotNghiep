@@ -24,14 +24,16 @@ const lichHopRouter = require('./Router/LichHopRouter');
 const thucTapRouter = require('./Router/ThucTapRouter');
 const dashboardRouter = require('./Router/DashboardRoute');
 const caiDatRouter = require('./Router/caiDatRouter');
+const hoiDongRouter = require('./Router/hoiDongRoute');
 
 // app.use(express.static(${__dirname}/public));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(helmet());
 
+app.use(express.json({ limit: '15kb' })); // cho phép dư liệu gửi đên không quá 15kb
 const limiter = rateLimit({
-  max: 100000,
-  windowMs: 60 * 60 * 1000,
+  max: 1000, // giới hạn mỗi IP 100 yêu cầu theo windowMS
+  windowMs: 60 * 60 * 1000, // trong 60 phút
   message: 'Too many request. Please try again in an hour.',
 });
 app.use(cookieParser());
@@ -57,38 +59,27 @@ app.use(
   }),
 );
 
-// middleware for request and response
-app.use(express.json({ limit: '15kb' })); // will modify data in request as json format
+app.use(express.json({ limit: '15kb' }));
 
 app.use('/api', limiter);
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-//data sanitization against NoSQL query injection
 app.use(mongoSanitize());
-//data sanitization against XSS
 app.use(xss());
-
-//prevent parameter pollution
 
 app.use(
   hpp({
-    whitelist: [
-      'duration',
-      'maxGroupSize',
-      'difficulty',
-      'price',
-      'ratingsAverage',
-      'ratingsQuantity',
-    ],
+    whitelist: ['name', 'maSo', 'password', 'doAn'],
   }),
 );
 
 app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString(); // add attribute date to request object
+  req.requestTime = new Date().toISOString();
   next();
 });
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use('/public', express.static(path.join(__dirname, '/public')));
 // use Router
 app.use('/api/user', userRouter);
 app.use('/api/deTai', deTaiRouter);
@@ -103,6 +94,7 @@ app.use('/api/thongBao', thongBaoRouter);
 app.use('/api/lichHop', lichHopRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/caiDat', caiDatRouter);
+app.use('/api/hoiDong', hoiDongRouter);
 
 app.use(errorController);
 module.exports = app;

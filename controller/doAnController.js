@@ -9,42 +9,49 @@ const fieldObj = require('../utils/filterObj');
 const { upload } = require('./uploadController');
 const SinhVien = require('../model/sinhVien');
 const caiDat = require('../model/CaiDatModel');
+const { getHocKyQuery } = require('../utils/getHocKyQuery');
+const APIFeature = require('../utils/apiFeatures');
 
 exports.updateDoAn = Factory.updateOne(doAn);
-exports.getAllDoAn = Factory.getAll(doAn, [
-  {
-    path: 'deTai',
-    select: 'tenDeTai moTa kyNangCanCo ketQuaCanDat',
-  },
-  {
-    path: 'giangVien',
-    select: 'maSo hoTen hinhAnh soDienThoai email ngaySinh',
-  },
-  {
-    path: 'sinhVien1',
-    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-  },
-  {
-    path: 'sinhVien2',
-    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-  },
-  {
-    path: 'giangVienPhanBien1',
-    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-  },
-  {
-    path: 'giangVienPhanBien2',
-    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-  },
-  {
-    path: 'sinhVien1Info',
-    select: 'thucTap doAn diem -_id',
-  },
-  {
-    path: 'sinhVien2Info',
-    select: 'thucTap doAn diem -_id',
-  },
-]);
+
+exports.getAllDoAn = catchAsync(async (req, res, next) => {
+  const { namHoc, hocKy } = await getHocKyQuery(req);
+
+  if (!namHoc || !hocKy) {
+    return next(
+      new ApiError('Invalid or missing academic year/semester.', 400),
+    );
+  }
+
+  const commonFields = 'maSo hoTen hinhAnh soDienThoai email ngaySinh';
+
+  const feature = await new APIFeature(doAn.find({ namHoc, hocKy }), req.query)
+    .filter()
+    .sort('maDoAn')
+    .fields()
+    .panigation();
+
+  const { query } = feature;
+  console.log(query);
+  const results = await query
+    .populate([
+      { path: 'deTai', select: 'tenDeTai moTa kyNangCanCo ketQuaCanDat' },
+      { path: 'giangVien', select: commonFields },
+      { path: 'sinhVien1', select: commonFields },
+      { path: 'sinhVien2', select: commonFields },
+      { path: 'giangVienPhanBien1', select: commonFields },
+      { path: 'giangVienPhanBien2', select: commonFields },
+      { path: 'sinhVien1Info', select: 'thucTap doAn diem -_id' },
+      { path: 'sinhVien2Info', select: 'thucTap doAn diem -_id' },
+    ])
+    .select('-__v');
+
+  res.status(200).json({
+    status: 'success',
+    results: results.length,
+    data: { results },
+  });
+});
 
 exports.getDoAn = Factory.getOne(doAn, [
   {
@@ -77,7 +84,6 @@ exports.deleteDoAn = Factory.deleteOne(doAn);
 exports.taoDoAn = catchAsync(async (req, res, next) => {
   let caiDatInfo = await caiDat.find();
   caiDatInfo = caiDatInfo[0];
-  console.log(caiDatInfo);
   const result = await doAn.create({ ...req.body, sinhVien1: req.user._id });
   res.status(201).json({
     status: 'success',
@@ -125,14 +131,11 @@ exports.themComment = catchAsync(async (req, res, next) => {
     },
   });
 });
-
+//lấy danh sách đồ án cho giảng viên
 exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
-  let { namHoc, hocKy } = req.query;
-  if (!namHoc && !hocKy) {
-    const caiDatInfo = await caiDat.find();
-    [{ namHoc, hocKy }] = caiDatInfo;
-  }
-  hocKy = parseInt(hocKy, 10);
+  // eslint-disable-next-line prefer-const
+  const { hocKy, namHoc } = await getHocKyQuery(req);
+
   const results = await doAn.aggregate([
     {
       // Join với bảng User để lấy thông tin sinhVien1
@@ -256,7 +259,9 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
         },
         sinhVien2: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
@@ -266,7 +271,9 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
         },
         sinhVien2Info: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
@@ -300,8 +307,10 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
     },
   });
 });
-
+// lấy danh sách đồ án phản biện cho giảng viên
 exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
+  const { hocKy, namHoc } = await getHocKyQuery(req);
+
   const results = await doAn.aggregate([
     {
       $lookup: {
@@ -370,6 +379,8 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
           { giangVienPhanBien1: req.user._id },
           { giangVienPhanBien2: req.user._id },
         ],
+        hocKy,
+        namHoc,
       },
     },
     {
@@ -387,7 +398,9 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
         },
         sinhVien2: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
@@ -397,12 +410,14 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
         },
         sinhVien2Info: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
             },
-            else: '$$REMOVE', // Exclude from the result if it's null
+            else: '$$REMOVE',
           },
         },
         giangVienPhanBien: {
@@ -467,7 +482,7 @@ exports.taiTaiLieu = catchAsync(async (req, res, next) => {
     res.status(200).json({ success: true, data: DoAn });
   });
 });
-
+// lấy thông tin sinh viên theo đồ án
 exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
   const result = await doAn.aggregate([
     {
@@ -546,7 +561,9 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
         },
         sinhVien2: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
@@ -556,7 +573,9 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
         },
         sinhVien2Info: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
@@ -574,8 +593,29 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.getDanhSachDoAnDat = catchAsync(async (req, res, next) => {
-  const doAnList = await doAn.find({ trangThai: { $in: [2, 7] } }).populate({
+// lấy danh sách đồ án đạt cuối kỳ
+exports.getDanhSachDoAnDatCuoiKy = catchAsync(async (req, res, next) => {
+  const { hocKy, namHoc } = await getHocKyQuery(req);
+  console.log({ hocKy, namHoc, trangThai: { $in: [2, 7, 8] } });
+  const doAnList = await doAn
+    .find({ hocKy, namHoc, trangThai: { $in: [2, 7, 8] } })
+    .populate({
+      path: 'sinhVien1 sinhVien2 giangVien',
+      select: 'maSo hoTen email lop',
+    });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      danhSachDoAn: doAnList,
+    },
+  });
+});
+// lấy danh sách đồ án không đạt cuối kỳ
+exports.getDanhSachDoAnKhongDatCuoiKy = catchAsync(async (req, res, next) => {
+  const { hocKy, namHoc } = await getHocKyQuery(req);
+
+  const doAnList = await doAn.find({ hocKy, namHoc, trangThai: 5 }).populate({
     path: 'sinhVien1 sinhVien2 giangVien',
     select: 'maSo hoTen email lop',
   });
@@ -583,7 +623,7 @@ exports.getDanhSachDoAnDat = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      doAn: doAnList,
+      danhSachDoAn: doAnList,
     },
   });
 });
@@ -628,7 +668,9 @@ exports.themGiangVienPhanBien = catchAsync(async (req, res, next) => {
     },
   });
 });
+// lấy danh sách đồ án đạt phản biện
 exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
+  const { hocKy, namHoc } = await getHocKyQuery(req);
   const doAnList = await doAn.aggregate([
     {
       // Liên kết với bảng sinh viên (sinhVien1 và sinhVien2)
@@ -773,6 +815,8 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
     {
       // Lọc chỉ lấy những đồ án mà sinh viên 1 và sinh viên 2 đều có điểm phản biện 1 và 2
       $match: {
+        hocKy,
+        namHoc,
         $or: [
           {
             'sinhVien1Info.diem.diemPhanBien.diemPhanBien1.diemTong': {
@@ -846,7 +890,7 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
     {
       // Lọc những đồ án có điểm trung bình >= 5
       $match: {
-        diemTrungBinhTong: { $gte: 5 },
+        diemTrungBinhTong: { $gte: 3 },
       },
     },
     {
@@ -874,7 +918,9 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
         },
         sinhVien2: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
@@ -884,7 +930,292 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
         },
         sinhVien2Info: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
+            then: {
+              sinhVienId: '$sinhVien2Info._id',
+              diem: '$sinhVien2Info.diem',
+            },
+            else: '$$REMOVE', // Exclude from the result if it's null
+          },
+        },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      DanhSachDoAn: doAnList,
+    },
+  });
+});
+// lấy danh sách không đạt phản biện
+exports.getDanhSachDoAnKhongDatPhanBien = catchAsync(async (req, res, next) => {
+  const { hocKy, namHoc } = await getHocKyQuery(req);
+  const doAnList = await doAn.aggregate([
+    {
+      // Liên kết với bảng sinh viên (sinhVien1 và sinhVien2)
+      $lookup: {
+        from: 'sinhviens',
+        localField: 'sinhVien1',
+        foreignField: 'userId',
+        as: 'sinhVien1Info',
+        pipeline: [
+          {
+            $project: { _id: 1, diem: 1, doAn: 1 },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'sinhviens',
+        localField: 'sinhVien2',
+        foreignField: 'userId',
+        as: 'sinhVien2Info',
+        pipeline: [
+          {
+            $project: { _id: 1, diem: 1, doAn: 1 },
+          },
+        ],
+      },
+    },
+    {
+      // Giải nén thông tin sinh viên
+      $unwind: {
+        path: '$sinhVien1Info',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$sinhVien2Info',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'sinhVien1',
+        foreignField: '_id',
+        as: 'user1Info',
+        pipeline: [
+          {
+            $project: { _id: 0, hoTen: 1, email: 1, soDienThoai: 1, maSo: 1 },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'sinhVien2',
+        foreignField: '_id',
+        as: 'user2Info',
+        pipeline: [
+          {
+            $project: { _id: 0, hoTen: 1, email: 1, soDienThoai: 1, maSo: 1 },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'giangVien',
+        foreignField: '_id',
+        as: 'giangVienInfo',
+        pipeline: [
+          {
+            $project: { _id: 0, hoTen: 1, email: 1, soDienThoai: 1, maSo: 1 },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'giangVienPhanBien1',
+        foreignField: '_id',
+        as: 'giangVienPhanBien1Info',
+        pipeline: [
+          {
+            $project: { _id: 0, hoTen: 1, email: 1, soDienThoai: 1, maSo: 1 },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'giangVienPhanBien2',
+        foreignField: '_id',
+        as: 'giangVienPhanBien2Info',
+        pipeline: [
+          {
+            $project: { _id: 0, hoTen: 1, email: 1, soDienThoai: 1, maSo: 1 },
+          },
+        ],
+      },
+    },
+
+    {
+      // Giải nén thông tin sinh viên
+      $unwind: {
+        path: '$user1Info',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$user2Info',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      // Giải nén thông tin sinh viên
+      $unwind: {
+        path: '$giangVienInfo',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      // Giải nén thông tin sinh viên
+      $unwind: {
+        path: '$giangVienPhanBien1Info',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      // Giải nén thông tin sinh viên
+      $unwind: {
+        path: '$giangVienPhanBien2Info',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      // Lọc chỉ lấy những đồ án mà sinh viên 1 và sinh viên 2 đều có điểm phản biện 1 và 2
+      $match: {
+        hocKy,
+        namHoc,
+        $or: [
+          {
+            'sinhVien1Info.diem.diemPhanBien.diemPhanBien1.diemTong': {
+              $ne: null,
+            },
+            'sinhVien1Info.diem.diemPhanBien.diemPhanBien2.diemTong': {
+              $ne: null,
+            },
+          },
+          {
+            'sinhVien2Info.diem.diemPhanBien.diemPhanBien1.diemTong': {
+              $ne: null,
+            },
+            'sinhVien2Info.diem.diemPhanBien.diemPhanBien2.diemTong': {
+              $ne: null,
+            },
+          },
+        ],
+      },
+    },
+    {
+      // Tính điểm trung bình của cả 2 sinh viên (nếu có sinhVien2)
+      $addFields: {
+        diemTrungBinhSinhVien1: {
+          $avg: [
+            '$sinhVien1Info.diem.diemPhanBien.diemPhanBien1.diemTong',
+            '$sinhVien1Info.diem.diemPhanBien.diemPhanBien2.diemTong',
+          ],
+        },
+        diemTrungBinhSinhVien2: {
+          $cond: {
+            if: { $ne: ['$sinhVien2Info', null] }, // Kiểm tra sinhVien2Info có tồn tại hay không
+            then: {
+              $avg: [
+                '$sinhVien2Info.diem.diemPhanBien.diemPhanBien1.diemTong',
+                '$sinhVien2Info.diem.diemPhanBien.diemPhanBien2.diemTong',
+              ],
+            },
+            else: null, // Nếu không có sinhVien2, để giá trị null
+          },
+        },
+        diemTrungBinhTong: {
+          $cond: {
+            if: { $ne: ['$sinhVien2Info', null] }, // Nếu có sinhVien2
+            then: {
+              $avg: [
+                {
+                  $avg: [
+                    '$sinhVien1Info.diem.diemPhanBien.diemPhanBien1.diemTong',
+                    '$sinhVien1Info.diem.diemPhanBien.diemPhanBien2.diemTong',
+                  ],
+                },
+                {
+                  $avg: [
+                    '$sinhVien2Info.diem.diemPhanBien.diemPhanBien1.diemTong',
+                    '$sinhVien2Info.diem.diemPhanBien.diemPhanBien2.diemTong',
+                  ],
+                },
+              ],
+            },
+            else: {
+              $avg: [
+                '$sinhVien1Info.diem.diemPhanBien.diemPhanBien1.diemTong',
+                '$sinhVien1Info.diem.diemPhanBien.diemPhanBien2.diemTong',
+              ], // Chỉ tính cho sinhVien1 nếu không có sinhVien2
+            },
+          },
+        },
+      },
+    },
+    {
+      // Lọc những đồ án có điểm trung bình >= 5
+      $match: {
+        diemTrungBinhTong: { $lt: 3 },
+      },
+    },
+    {
+      // Sắp xếp theo điểm trung bình tổng (diemTrungBinhTong)
+      $sort: {
+        diemTrungBinhTong: -1, // Sắp xếp theo thứ tự giảm dần
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        tenDoAn: 1,
+        maDoAn: 1,
+        giangVienInfo: 1,
+        giangVienPhanBien1Info: 1,
+        giangVienPhanBien2Info: 1,
+        diemTrungBinhTong: 1,
+        sinhVien1Info: {
+          sinhVienId: '$sinhVien1Info._id',
+          diem: '$sinhVien1Info.diem',
+        },
+        sinhVien1: {
+          maSo: '$user1Info.maSo',
+          hoTen: '$user1Info.hoTen',
+        },
+        sinhVien2: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
+            then: {
+              maSo: '$user2Info.maSo',
+              hoTen: '$user2Info.hoTen',
+            },
+            else: '$$REMOVE',
+          },
+        },
+        sinhVien2Info: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
@@ -925,7 +1256,9 @@ exports.themNhieuGiangVienHoiDong = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: 'success', data: { result } });
 });
+//lấy danh sách đồ án cần phản biện
 exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
+  const { namHoc, hocKy } = await getHocKyQuery(req);
   const result = await doAn.aggregate([
     {
       $lookup: {
@@ -980,6 +1313,8 @@ exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
 
     {
       $match: {
+        namHoc,
+        hocKy,
         'giangVienHoiDong.giangVien': {
           $elemMatch: { userId: req.user._id },
         },
@@ -1000,22 +1335,26 @@ exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
         },
         sinhVien2: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            },
             then: {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
             },
-            else: '$$REMOVE',
+            else: null,
           },
         },
         sinhVien2Info: {
           $cond: {
-            if: { $ne: ['$user2Info', null] }, // Check if sinhVien2Info is not null
+            if: {
+              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+            }, // Check if sinhVien2Info is not null
             then: {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
             },
-            else: '$$REMOVE', // Exclude from the result if it's null
+            else: null,
           },
         },
         stt: {

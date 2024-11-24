@@ -11,10 +11,10 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRED_IN,
   });
 const createSendToken = (newUser, statusCode, res) => {
-  const token = signToken(newUser._id); // Assuming 'singToken' was a typo, should be 'signToken'
+  const token = signToken(newUser._id);
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIES_EXPIRES * 60 * 24 * 60 * 1000, // Make sure JWT_COOKIES_EXPIRES is properly set in the .env
+      Date.now() + process.env.JWT_COOKIES_EXPIRES * 60 * 24 * 60 * 1000,
     ),
     httpOnly: true,
   };
@@ -80,14 +80,12 @@ exports.isLoggedIn = async (req, res, next) => {
 };
 exports.login = catchAsync(async (req, res, next) => {
   const { maSo, password } = req.body;
-
   // 1) Check if email and password exist
   if (!maSo || !password) {
     return next(new ApiError('Vui lòng nhập đầy đủ mã số và password', 400));
   }
   // 2) Check if user exists && password is correct
   let user = await User.findOne({ maSo }).select('+password');
-
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new ApiError('Mã số hoặc password không đúng!', 401));
   }

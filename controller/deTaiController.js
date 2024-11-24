@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const deTai = require('../model/deTaiModel');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
@@ -22,6 +23,9 @@ exports.taoDeTai = catchAsync(async (req, res) => {
   });
 });
 exports.getAllDeTaiTheoGiangVien = catchAsync(async (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.user._id)) {
+    return res.status(400).send('Invalid ID format');
+  }
   const deTais = await deTai.find({ giangVien: req.user._id });
   res.status(200).json({
     status: 'success',
@@ -36,23 +40,23 @@ exports.getDanhMucDeTai = catchAsync(async (req, res, next) => {
   });
 });
 exports.getDanhSachDeTaiDaDuyet = catchAsync(async (req, res, next) => {
-  const danhMuc = await deTai.find({ trangThai: 1 }).populate({
+  const DanhSachDeTai = await deTai.find({ trangThai: 1 }).populate({
     path: 'giangVien',
     select: 'maSo hoTen email soDienThoai',
   });
   res.status(200).json({
     status: 'success',
-    data: { danhMuc },
+    data: { DanhSachDeTai },
   });
 });
 exports.getDanhSachDeTaiChoDuyet = catchAsync(async (req, res, next) => {
-  const danhMuc = await deTai.find({ trangThai: 0 }).populate({
+  const DanhSachDeTai = await deTai.find({ trangThai: 0 }).populate({
     path: 'giangVien',
     select: 'maSo hoTen email soDienThoai',
   });
   res.status(200).json({
     status: 'success',
-    data: { danhMuc },
+    data: { DanhSachDeTai },
   });
 });
 exports.getDanhSachDeTaiDanhKy = catchAsync(async (req, res, next) => {
