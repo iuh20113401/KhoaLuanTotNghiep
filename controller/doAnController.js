@@ -388,6 +388,7 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
         _id: 1,
         maDoAn: 1,
         tenDoAn: 1,
+        taiLieuPhanBien: 1,
         sinhVien1Info: {
           sinhVienId: '$sinhVien1Info._id',
           diem: '$sinhVien1Info.diem',
@@ -444,7 +445,7 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
     },
   });
 });
-
+//Tạo tài liệu đồ án
 exports.taiTaiLieu = catchAsync(async (req, res, next) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -481,6 +482,129 @@ exports.taiTaiLieu = catchAsync(async (req, res, next) => {
 
     res.status(200).json({ success: true, data: DoAn });
   });
+});
+//Tạo tài liệu cho giảng viên phản biện đồ án
+exports.taiTaiLieuPhanBien = catchAsync(async (req, res, next) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res
+        .status(400)
+        .json({ status: false, data: { message: err.message } });
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, data: { message: 'No file uploaded' } });
+    }
+
+    // Update the doAn document
+    const DoAn = await doAn.findById(req.params.id);
+
+    if (!DoAn) {
+      return res
+        .status(404)
+        .json({ success: false, data: { message: 'Không tìm thấy đồ án' } });
+    }
+
+    // Add the file info to the taiLieu array
+    DoAn.taiLieuPhanBien?.push({
+      tenTaiLieu: req.file.originalname,
+      loaiTaiLieu: req.file.mimetype,
+      dungLuong: `${(req.file.size / 1024).toFixed(2)} KB`,
+      duongDan: req.file.path,
+    });
+
+    // Save the document
+    await DoAn.save();
+
+    res.status(200).json({ success: true, data: DoAn });
+  });
+});
+// Xóa tài liệu phản biện
+exports.xoaTaiLieuPhanBien = catchAsync(async (req, res, next) => {
+  // Update the doAn document
+  const DoAn = await doAn.findById(req.params.id);
+
+  if (!DoAn) {
+    return res
+      .status(404)
+      .json({ success: false, data: { message: 'Không tìm thấy đồ án' } });
+  }
+  if (DoAn.taiLieuPhanBien?.length < 0)
+    return res
+      .status(404)
+      .json({ success: false, data: { message: 'Không tìm thấy tài liệu' } });
+
+  DoAn.taiLieuPhanBien = DoAn.taiLieuPhanBien.filter(
+    (tl) => tl._id.toString() !== req.params.taiLieuId,
+  );
+  // Save the document
+  await DoAn.save();
+
+  res.status(200).json({ success: true, data: DoAn });
+});
+//Tạo tài liệu cho giảng viên hội đồng đồ án
+
+exports.taiTaiLieuHoiDong = catchAsync(async (req, res, next) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res
+        .status(400)
+        .json({ status: false, data: { message: err.message } });
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, data: { message: 'No file uploaded' } });
+    }
+
+    // Update the doAn document
+    const DoAn = await doAn.findById(req.params.id);
+
+    if (!DoAn) {
+      return res
+        .status(404)
+        .json({ success: false, data: { message: 'Không tìm thấy đồ án' } });
+    }
+
+    // Add the file info to the taiLieu array
+    DoAn.taiLieuHoiDong?.push({
+      tenTaiLieu: req.file.originalname,
+      loaiTaiLieu: req.file.mimetype,
+      dungLuong: `${(req.file.size / 1024).toFixed(2)} KB`,
+      duongDan: req.file.path,
+    });
+
+    // Save the document
+    await DoAn.save();
+
+    res.status(200).json({ success: true, data: DoAn });
+  });
+});
+// Xoa tai lieu hội đồng
+exports.xoaTaiLieuHoiDong = catchAsync(async (req, res, next) => {
+  // Update the doAn document
+  const DoAn = await doAn.findById(req.params.id);
+
+  if (!DoAn) {
+    return res
+      .status(404)
+      .json({ success: false, data: { message: 'Không tìm thấy đồ án' } });
+  }
+  if (DoAn.taiLieuHoiDong?.length < 0)
+    return res
+      .status(404)
+      .json({ success: false, data: { message: 'Không tìm thấy tài liệu' } });
+
+  DoAn.taiLieuHoiDong = DoAn.taiLieuHoiDong.filter(
+    (tl) => tl._id.toString() !== req.params.taiLieuId,
+  );
+  // Save the document
+  await DoAn.save();
+
+  res.status(200).json({ success: true, data: DoAn });
 });
 // lấy thông tin sinh viên theo đồ án
 exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
@@ -1259,7 +1383,7 @@ exports.themNhieuGiangVienHoiDong = catchAsync(async (req, res, next) => {
 //lấy danh sách đồ án cần phản biện
 exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
   const { namHoc, hocKy } = await getHocKyQuery(req);
-  const result = await doAn.aggregate([
+  const results = await doAn.aggregate([
     {
       $lookup: {
         from: 'users',
@@ -1325,6 +1449,7 @@ exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
         _id: 1,
         maDoAn: 1,
         tenDoAn: 1,
+        taiLieuHoiDong: 1,
         sinhVien1Info: {
           sinhVienId: '$sinhVien1Info._id',
           diem: '$sinhVien1Info.diem',
@@ -1374,7 +1499,7 @@ exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      result,
+      results,
     },
   });
 });

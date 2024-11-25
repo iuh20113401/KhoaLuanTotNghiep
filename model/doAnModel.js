@@ -115,6 +115,24 @@ const doAnSchema = mongoose.Schema(
         ngayDang: { type: Date, default: Date.now() },
       },
     ],
+    taiLieuPhanBien: [
+      {
+        tenTaiLieu: { type: String, trim: true },
+        loaiTaiLieu: String,
+        dungLuong: String,
+        duongDan: { type: String, trim: true },
+        ngayDang: { type: Date, default: Date.now() },
+      },
+    ],
+    taiLieuHoiDong: [
+      {
+        tenTaiLieu: { type: String, trim: true },
+        loaiTaiLieu: String,
+        dungLuong: String,
+        duongDan: { type: String, trim: true },
+        ngayDang: { type: Date, default: Date.now() },
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
