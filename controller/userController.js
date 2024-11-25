@@ -223,7 +223,6 @@ exports.capNhatThongTinTaiKhoan = catchAsync(async (req, res, next) => {
     'ngaySinh',
     'lop',
   );
-
   // Tìm và cập nhật người dùng
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
