@@ -64,6 +64,9 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
       },
     },
     {
+      $unwind: '$user1Info',
+    },
+    {
       $lookup: {
         from: 'users',
         localField: 'giangVien',
@@ -136,7 +139,6 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
       },
     },
     {
-      // Join với bảng deTai để lấy thông tin đề tài
       $lookup: {
         from: 'detais',
         localField: 'deTai',
@@ -145,7 +147,6 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
       },
     },
     {
-      // Unwind để xử lý mảng deTaiInfo
       $unwind: '$deTaiInfo',
     },
     {
@@ -155,7 +156,6 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
     },
 
     {
-      // Calculate the completion percentage
       $project: {
         _id: 1,
         maDoAn: 1,
@@ -166,7 +166,6 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
         giangVien: '$giangVienInfo',
         giangVienPhanBien1: '$giangVienPhanBien1Info',
         giangVienPhanBien2: '$giangVienPhanBien2Info',
-
         sinhVien1: {
           maSo: '$user1Info.maSo',
           hoTen: '$user1Info.hoTen',
