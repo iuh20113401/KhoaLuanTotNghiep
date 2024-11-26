@@ -429,7 +429,7 @@ exports.getDanhSachDoAnPhanBien = catchAsync(async (req, res, next) => {
               $cond: {
                 if: { $eq: ['$giangVienPhanBien2', req.user._id] },
                 then: '2',
-                else: null,
+                else: '$$REMOVE',
               },
             },
           },
@@ -979,7 +979,7 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
                 '$sinhVien2Info.diem.diemPhanBien.diemPhanBien2.diemTong',
               ],
             },
-            else: null, // Nếu không có sinhVien2, để giá trị null
+            else: '$$REMOVE', // Nếu không có sinhVien2, để giá trị null
           },
         },
         diemTrungBinhTong: {
@@ -1028,6 +1028,7 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
         _id: 1,
         tenDoAn: 1,
         maDoAn: 1,
+        giangVienHoiDong: 1,
         giangVienInfo: 1,
         giangVienPhanBien1Info: 1,
         giangVienPhanBien2Info: 1,
@@ -1467,7 +1468,7 @@ exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
             },
-            else: null,
+            else: '$$REMOVE',
           },
         },
         sinhVien2Info: {
@@ -1479,7 +1480,7 @@ exports.getDanhSachDoAnHoiDong = catchAsync(async (req, res, next) => {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
             },
-            else: null,
+            else: '$$REMOVE',
           },
         },
         stt: {
