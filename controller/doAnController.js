@@ -92,15 +92,18 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
     },
     {
       $unwind: '$giangVienInfo',
-      preserveNullAndEmptyArrays: true,
     },
     {
-      $unwind: '$giangVienPhanBien1Info',
-      preserveNullAndEmptyArrays: true,
+      $unwind: {
+        path: '$giangVienPhanBien1Info',
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
-      $unwind: '$giangVienPhanBien2Info',
-      preserveNullAndEmptyArrays: true,
+      $unwind: {
+        path: '$giangVienPhanBien2Info',
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
