@@ -167,6 +167,8 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
         maDoAn: 1,
         tenDoAn: 1,
         taiLieu: 1,
+        taiLieuPhanBien: 1,
+        taiLieuHoiDong: 1,
         trangThai: 1,
         deTai: '$deTaiInfo',
         giangVien: '$giangVienInfo',
