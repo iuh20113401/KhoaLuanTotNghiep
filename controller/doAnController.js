@@ -64,11 +64,11 @@ exports.getDoAn = Factory.getOne(doAn, [
   },
   {
     path: 'sinhVien1',
-    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
+    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh diemDanh',
   },
   {
     path: 'sinhVien2',
-    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
+    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh diemDanh',
   },
   {
     path: 'giangVienPhanBien1',
@@ -261,7 +261,7 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
           $cond: {
             if: {
               $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
-            }, // Check if sinhVien2Info is not null
+            },
             then: {
               maSo: '$user2Info.maSo',
               hoTen: '$user2Info.hoTen',
@@ -278,7 +278,7 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
               sinhVienId: '$sinhVien2Info._id',
               diem: '$sinhVien2Info.diem',
             },
-            else: '$$REMOVE', // Exclude from the result if it's null
+            else: '$$REMOVE',
           },
         },
         huongDan: 1,
