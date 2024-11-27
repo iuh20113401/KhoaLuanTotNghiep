@@ -33,7 +33,6 @@ exports.getAllDoAn = catchAsync(async (req, res, next) => {
     .panigation();
 
   const { query } = feature;
-  console.log(query);
   const results = await query
     .populate([
       { path: 'deTai', select: 'tenDeTai moTa kyNangCanCo ketQuaCanDat' },
@@ -205,17 +204,7 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
       },
     },
   ]);
-  console.log(
-    await doAn.aggregate([
-      {
-        $match: {
-          _id: new mongoose.Types.ObjectId(req.params.id),
-        },
-      },
-    ]),
-    req.params.id,
-    result,
-  );
+  
   res.status(200).json({ message: 'success', data: { result: result[0] } });
 });
 // exports.getDoAn = Factory.getOne(doAn, [
