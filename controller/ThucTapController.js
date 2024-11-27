@@ -162,7 +162,7 @@ exports.getDanhSachThucTapTheoGiangVien = catchAsync(async (req, res, next) => {
     [{ namHoc, hocKy }] = caiDatInfo;
   }
   hocKy = parseInt(hocKy, 10);
-  const result = await ThucTap.aggregate([
+  const results = await ThucTap.aggregate([
     {
       // Join với bảng User để lấy thông tin sinhVien1
       $lookup: {
@@ -231,7 +231,7 @@ exports.getDanhSachThucTapTheoGiangVien = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      result,
+      results,
     },
   });
 });
