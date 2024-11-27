@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const Mongoose = require('mongoose');
 const ThucTap = require('../model/ThucTapModel');
 const ApiError = require('../utils/ApiError');
@@ -78,16 +79,92 @@ exports.getAllThucTap = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.getThucTap = Factory.getOne(ThucTap, [
-  {
-    path: 'userId',
-    select: 'maSo hoTen hinhAnh email soDienThoai',
-  },
-  {
-    path: 'giangVien',
-    select: 'maSo hoTen hinhAnh email soDienThoai',
-  },
-]);
+exports.getThucTap = catchAsync(async (req, res, next) => {
+  const result = await ThucTap.aggregate([
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'userInfo',
+      },
+    },
+    {
+      $unwind: '$userInfo',
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'giangVien',
+        foreignField: '_id',
+        as: 'giangVienInfo',
+      },
+    },
+    {
+      $unwind: '$giangVienInfo',
+    },
+
+    {
+      $lookup: {
+        from: 'sinhviens',
+        localField: 'userInfo._id',
+        foreignField: 'userId',
+        as: 'sinhVienInfo',
+      },
+    },
+    {
+      $unwind: '$sinhVienInfo',
+    },
+
+    {
+      $lookup: {
+        from: 'detais',
+        localField: 'deTai',
+        foreignField: '_id',
+        as: 'deTaiInfo',
+      },
+    },
+    {
+      $unwind: '$deTaiInfo',
+    },
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.params.id),
+      },
+    },
+
+    {
+      $project: {
+        _id: 1,
+        hocKy: 1,
+        namHoc: 1,
+        comment: 1,
+        giangVien: '$giangVienInfo',
+        sinhVien: {
+          maSo: '$userInfo.maSo',
+          hoTen: '$userInfo.hoTen',
+          hinhAnh: '$userInfo.hinhAnh',
+          soDienThoai: '$userInfo.soDienThoai',
+          email: '$userInfo.email',
+          ngaySinh: '$userInfo.ngaySinh',
+          diemDanh: '$sinhVienInfo.diemDanh',
+          diem: '$sinhVienInfo.diem',
+        },
+      },
+    },
+  ]);
+  res.status(200).json({ status: 'success', data: { result } });
+});
+// exports.getThucTap = Factory.getOne(ThucTap, [
+//   {
+//     path: 'userId',
+//     select: 'maSo hoTen hinhAnh email soDienThoai',
+//   },
+//   {
+//     path: 'giangVien',
+//     select: 'maSo hoTen hinhAnh email soDienThoai',
+//   },
+// ]);
 exports.deleteThucTap = Factory.deleteOne(ThucTap);
 exports.updateThucTap = Factory.updateOne(ThucTap);
 
