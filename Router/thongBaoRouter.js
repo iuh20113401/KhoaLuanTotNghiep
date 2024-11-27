@@ -22,5 +22,6 @@ thongBaoRouter
 thongBaoRouter
   .route('/:id')
   .get(thongBaoController.getThongBao)
-  .patch(thongBaoController.updateThongBao);
+  .patch(thongBaoController.updateThongBao)
+  .delete(thongBaoController.deleteThongBao);
 module.exports = thongBaoRouter;
