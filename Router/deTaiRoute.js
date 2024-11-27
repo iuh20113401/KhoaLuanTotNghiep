@@ -24,5 +24,5 @@ deTaiRouter
   .route('/:id')
   .get(deTaiController.getDeTai)
   .patch(deTaiController.xoaTrangThai, deTaiController.updateDeTai)
-  .delete(deTaiController.deleteDeTai);
+  .delete(deTaiController.xoaDeTai);
 module.exports = deTaiRouter;
