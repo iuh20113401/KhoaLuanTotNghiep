@@ -885,7 +885,6 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
 // lấy danh sách đồ án đạt cuối kỳ
 exports.getDanhSachDoAnDatCuoiKy = catchAsync(async (req, res, next) => {
   const { hocKy, namHoc } = await getHocKyQuery(req);
-  console.log({ hocKy, namHoc, trangThai: { $in: [2, 7, 8] } });
   const doAnList = await doAn
     .find({ hocKy, namHoc, trangThai: { $in: [2, 7, 8] } })
     .populate({
@@ -896,7 +895,7 @@ exports.getDanhSachDoAnDatCuoiKy = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      danhSachDoAn: doAnList,
+      results: doAnList,
     },
   });
 });
@@ -912,7 +911,7 @@ exports.getDanhSachDoAnKhongDatCuoiKy = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      danhSachDoAn: doAnList,
+      results: doAnList,
     },
   });
 });
@@ -1237,7 +1236,7 @@ exports.getDanhSachDoAnDatPhanBien = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      DanhSachDoAn: doAnList,
+      results: doAnList,
     },
   });
 });
@@ -1520,7 +1519,7 @@ exports.getDanhSachDoAnKhongDatPhanBien = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      DanhSachDoAn: doAnList,
+      results: doAnList,
     },
   });
 });
