@@ -15,6 +15,13 @@ exports.xoaTrangThai = catchAsync(async (req, res, next) => {
   excludeFields.forEach((el) => delete req.body[el]);
   next();
 });
+exports.xoaDeTai = catchAsync(async (req, res, next) => {
+  const result = await deTai.findByIdAndUpdate(req.params.id, { trangThai: 3 });
+  res.status(200).json({
+    status: 'success',
+    data: { deTai: result },
+  });
+});
 exports.taoDeTai = catchAsync(async (req, res) => {
   const newDeTai = await deTai.create({ ...req.body, giangVien: req.user });
   res.status(201).json({
@@ -26,7 +33,10 @@ exports.getAllDeTaiTheoGiangVien = catchAsync(async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.user._id)) {
     return res.status(400).send('Invalid ID format');
   }
-  const deTais = await deTai.find({ giangVien: req.user._id });
+  const deTais = await deTai.find({
+    giangVien: req.user._id,
+    trangThai: { $ne: 3 },
+  });
   res.status(200).json({
     status: 'success',
     data: { DanhSachDeTai: deTais },

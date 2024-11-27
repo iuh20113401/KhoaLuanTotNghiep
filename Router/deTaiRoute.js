@@ -23,5 +23,6 @@ deTaiRouter.route('/duyetdetai/:id').patch(deTaiController.duyetDeTai);
 deTaiRouter
   .route('/:id')
   .get(deTaiController.getDeTai)
-  .patch(deTaiController.xoaTrangThai, deTaiController.updateDeTai);
+  .patch(deTaiController.xoaTrangThai, deTaiController.updateDeTai)
+  .delete(deTaiController.deleteDeTai);
 module.exports = deTaiRouter;
