@@ -117,17 +117,6 @@ exports.getThucTap = catchAsync(async (req, res, next) => {
     },
 
     {
-      $lookup: {
-        from: 'detais',
-        localField: 'deTai',
-        foreignField: '_id',
-        as: 'deTaiInfo',
-      },
-    },
-    {
-      $unwind: '$deTaiInfo',
-    },
-    {
       $match: {
         _id: new mongoose.Types.ObjectId(req.params.id),
       },
