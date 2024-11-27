@@ -154,7 +154,7 @@ exports.getThucTap = catchAsync(async (req, res, next) => {
       },
     },
   ]);
-  res.status(200).json({ status: 'success', data: { result } });
+  res.status(200).json({ status: 'success', data: { result: result[0] } });
 });
 // exports.getThucTap = Factory.getOne(ThucTap, [
 //   {
