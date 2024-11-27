@@ -1529,13 +1529,14 @@ exports.themNhieuGiangVienHoiDong = catchAsync(async (req, res, next) => {
 
     return {
       updateOne: {
-        filter: { _id: new Mongoose.Types.ObjectId(_id) }, // Match document by _id
+        filter: { _id: new Mongoose.Types.ObjectId(_id) },
         update: {
           $set: {
             giangVienHoiDong: {
               loai: loai,
               giangVien,
             },
+            trangThai: loai === 1 ? 3 : 4,
           },
         },
       },
