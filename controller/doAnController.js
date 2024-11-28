@@ -868,7 +868,7 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      sinhVien: [...result[0]],
+      result: result[0],
     },
   });
 });

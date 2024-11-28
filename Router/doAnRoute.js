@@ -35,16 +35,16 @@ doAnRouter.route('/:id/taiLieu').post(doAnController.taiTaiLieu);
 doAnRouter
   .route('/:id/taiLieuPhanBien')
   .post(doAnController.taiTaiLieuPhanBien);
-doAnRouter
-  .route('/:id/taiLieuPhanBien/:taiLieuId')
-  .delete(doAnController.xoaTaiLieuPhanBien);
 doAnRouter.route('/:id/taiLieuHoiDong').post(doAnController.taiTaiLieuHoiDong);
-doAnRouter
-  .route('/:id/taiLieuHoiDong/:taiLieuId')
-  .delete(doAnController.taiTaiLieuHoiDong);
 doAnRouter
   .route('/:id/GiangVienPhanBien')
   .post(doAnController.themGiangVienPhanBien);
+doAnRouter
+  .route('/:id/taiLieuPhanBien/:taiLieuId')
+  .delete(doAnController.xoaTaiLieuPhanBien);
+doAnRouter
+  .route('/:id/taiLieuHoiDong/:taiLieuId')
+  .delete(doAnController.taiTaiLieuHoiDong);
 doAnRouter
   .route('/:id')
   .get(doAnController.getDoAn)
