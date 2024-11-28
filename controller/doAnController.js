@@ -204,7 +204,7 @@ exports.getDoAn = catchAsync(async (req, res, next) => {
       },
     },
   ]);
-  
+
   res.status(200).json({ message: 'success', data: { result: result[0] } });
 });
 // exports.getDoAn = Factory.getOne(doAn, [
@@ -867,7 +867,7 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      sinhVien: [...result[0].sinhVien],
+      sinhVien: [...result[0]],
     },
   });
 });
