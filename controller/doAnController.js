@@ -52,188 +52,188 @@ exports.getAllDoAn = catchAsync(async (req, res, next) => {
     data: { results },
   });
 });
-exports.getDoAn = catchAsync(async (req, res, next) => {
-  const result = await doAn.aggregate([
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'sinhVien1',
-        foreignField: '_id',
-        as: 'user1Info',
-      },
-    },
-    {
-      $unwind: '$user1Info',
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'giangVien',
-        foreignField: '_id',
-        as: 'giangVienInfo',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'giangVienPhanBien1',
-        foreignField: '_id',
-        as: 'giangVienPhanBien1Info',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'giangVienPhanBien2',
-        foreignField: '_id',
-        as: 'giangVienPhanBien2Info',
-      },
-    },
-    {
-      $unwind: '$giangVienInfo',
-    },
-    {
-      $unwind: {
-        path: '$giangVienPhanBien1Info',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $unwind: {
-        path: '$giangVienPhanBien2Info',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'sinhVien2',
-        foreignField: '_id',
-        as: 'user2Info',
-      },
-    },
-    {
-      $unwind: {
-        path: '$user2Info',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: 'sinhviens',
-        localField: 'user1Info._id',
-        foreignField: 'userId',
-        as: 'sinhVien1Info',
-      },
-    },
-    {
-      $unwind: '$sinhVien1Info',
-    },
-    {
-      $lookup: {
-        from: 'sinhviens',
-        localField: 'user2Info._id',
-        foreignField: 'userId',
-        as: 'sinhVien2Info',
-      },
-    },
-    {
-      $unwind: {
-        path: '$sinhVien2Info',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: 'detais',
-        localField: 'deTai',
-        foreignField: '_id',
-        as: 'deTaiInfo',
-      },
-    },
-    {
-      $unwind: '$deTaiInfo',
-    },
-    {
-      $match: {
-        _id: new mongoose.Types.ObjectId(req.params.id),
-      },
-    },
+// exports.getDoAn = catchAsync(async (req, res, next) => {
+//   const result = await doAn.aggregate([
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'sinhVien1',
+//         foreignField: '_id',
+//         as: 'user1Info',
+//       },
+//     },
+//     {
+//       $unwind: '$user1Info',
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'giangVien',
+//         foreignField: '_id',
+//         as: 'giangVienInfo',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'giangVienPhanBien1',
+//         foreignField: '_id',
+//         as: 'giangVienPhanBien1Info',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'giangVienPhanBien2',
+//         foreignField: '_id',
+//         as: 'giangVienPhanBien2Info',
+//       },
+//     },
+//     {
+//       $unwind: '$giangVienInfo',
+//     },
+//     {
+//       $unwind: {
+//         path: '$giangVienPhanBien1Info',
+//         preserveNullAndEmptyArrays: true,
+//       },
+//     },
+//     {
+//       $unwind: {
+//         path: '$giangVienPhanBien2Info',
+//         preserveNullAndEmptyArrays: true,
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'sinhVien2',
+//         foreignField: '_id',
+//         as: 'user2Info',
+//       },
+//     },
+//     {
+//       $unwind: {
+//         path: '$user2Info',
+//         preserveNullAndEmptyArrays: true,
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'sinhviens',
+//         localField: 'user1Info._id',
+//         foreignField: 'userId',
+//         as: 'sinhVien1Info',
+//       },
+//     },
+//     {
+//       $unwind: '$sinhVien1Info',
+//     },
+//     {
+//       $lookup: {
+//         from: 'sinhviens',
+//         localField: 'user2Info._id',
+//         foreignField: 'userId',
+//         as: 'sinhVien2Info',
+//       },
+//     },
+//     {
+//       $unwind: {
+//         path: '$sinhVien2Info',
+//         preserveNullAndEmptyArrays: true,
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'detais',
+//         localField: 'deTai',
+//         foreignField: '_id',
+//         as: 'deTaiInfo',
+//       },
+//     },
+//     {
+//       $unwind: '$deTaiInfo',
+//     },
+//     {
+//       $match: {
+//         _id: new mongoose.Types.ObjectId(req.params.id),
+//       },
+//     },
 
-    {
-      $project: {
-        _id: 1,
-        maDoAn: 1,
-        tenDoAn: 1,
-        taiLieu: 1,
-        taiLieuPhanBien: 1,
-        taiLieuHoiDong: 1,
-        trangThai: 1,
-        comment: 1,
-        deTai: '$deTaiInfo',
-        giangVien: '$giangVienInfo',
-        giangVienPhanBien1: '$giangVienPhanBien1Info',
-        giangVienPhanBien2: '$giangVienPhanBien2Info',
-        sinhVien1: {
-          maSo: '$user1Info.maSo',
-          hoTen: '$user1Info.hoTen',
-          hinhAnh: '$user1Info.hinhAnh',
-          soDienThoai: '$user1Info.soDienThoai',
-          email: '$user1Info.email',
-          ngaySinh: '$user1Info.ngaySinh',
-          diemDanh: '$sinhVien1Info.diemDanh',
-          diem: '$sinhVien1Info.diem',
-        },
-        sinhVien2: {
-          $cond: {
-            if: {
-              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
-            },
-            then: {
-              maSo: '$user2Info.maSo',
-              hoTen: '$user2Info.hoTen',
-              hinhAnh: '$user2Info.hinhAnh',
-              soDienThoai: '$user2Info.soDienThoai',
-              email: '$user2Info.email',
-              ngaySinh: '$user2Info.ngaySinh',
-              diemDanh: '$sinhVien2Info.diemDanh',
-              diem: '$sinhVien2Info.diem',
-            },
-            else: '$$REMOVE',
-          },
-        },
-      },
-    },
-  ]);
+//     {
+//       $project: {
+//         _id: 1,
+//         maDoAn: 1,
+//         tenDoAn: 1,
+//         taiLieu: 1,
+//         taiLieuPhanBien: 1,
+//         taiLieuHoiDong: 1,
+//         trangThai: 1,
+//         comment: 1,
+//         deTai: '$deTaiInfo',
+//         giangVien: '$giangVienInfo',
+//         giangVienPhanBien1: '$giangVienPhanBien1Info',
+//         giangVienPhanBien2: '$giangVienPhanBien2Info',
+//         sinhVien1: {
+//           maSo: '$user1Info.maSo',
+//           hoTen: '$user1Info.hoTen',
+//           hinhAnh: '$user1Info.hinhAnh',
+//           soDienThoai: '$user1Info.soDienThoai',
+//           email: '$user1Info.email',
+//           ngaySinh: '$user1Info.ngaySinh',
+//           diemDanh: '$sinhVien1Info.diemDanh',
+//           diem: '$sinhVien1Info.diem',
+//         },
+//         sinhVien2: {
+//           $cond: {
+//             if: {
+//               $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
+//             },
+//             then: {
+//               maSo: '$user2Info.maSo',
+//               hoTen: '$user2Info.hoTen',
+//               hinhAnh: '$user2Info.hinhAnh',
+//               soDienThoai: '$user2Info.soDienThoai',
+//               email: '$user2Info.email',
+//               ngaySinh: '$user2Info.ngaySinh',
+//               diemDanh: '$sinhVien2Info.diemDanh',
+//               diem: '$sinhVien2Info.diem',
+//             },
+//             else: '$$REMOVE',
+//           },
+//         },
+//       },
+//     },
+//   ]);
 
-  res.status(200).json({ message: 'success', data: { result: result[0] } });
-});
-// exports.getDoAn = Factory.getOne(doAn, [
-//   {
-//     path: 'deTai',
-//     select: 'tenDeTai moTa kyNangCanCo ketQuaCanDat',
-//   },
-//   {
-//     path: 'giangVien',
-//     select: 'maSo hoTen hinhAnh soDienThoai email ngaySinh',
-//   },
-//   {
-//     path: 'sinhVien1',
-//     select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-//   },
-//   {
-//     path: 'sinhVien2',
-//     select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-//   },
-//   {
-//     path: 'giangVienPhanBien1',
-//     select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-//   },
-//   {
-//     path: 'giangVienPhanBien2',
-//     select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
-//   },
-// ]);
+//   res.status(200).json({ message: 'success', data: { result: result[0] } });
+// });
+exports.getDoAn = Factory.getOne(doAn, [
+  {
+    path: 'deTai',
+    select: 'tenDeTai moTa kyNangCanCo ketQuaCanDat',
+  },
+  {
+    path: 'giangVien',
+    select: 'maSo hoTen hinhAnh soDienThoai email ngaySinh',
+  },
+  {
+    path: 'sinhVien1',
+    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
+  },
+  {
+    path: 'sinhVien2',
+    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
+  },
+  {
+    path: 'giangVienPhanBien1',
+    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
+  },
+  {
+    path: 'giangVienPhanBien2',
+    select: 'maSo hinhAnh hoTen soDienThoai email ngaySinh',
+  },
+]);
 exports.deleteDoAn = Factory.deleteOne(doAn);
 
 exports.taoDoAn = catchAsync(async (req, res, next) => {
