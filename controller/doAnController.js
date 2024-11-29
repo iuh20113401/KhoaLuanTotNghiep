@@ -865,6 +865,7 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
       },
     },
   ]);
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -876,7 +877,7 @@ exports.getThongTinSinhVienTheoDoAn = catchAsync(async (req, res, next) => {
 exports.getDanhSachDoAnDatCuoiKy = catchAsync(async (req, res, next) => {
   const { hocKy, namHoc } = await getHocKyQuery(req);
   const doAnList = await doAn
-    .find({ hocKy, namHoc, trangThai: { $in: [2, 7, 8] } })
+    .find({ hocKy, namHoc, trangThai: { $in: [2, 3, 4, 6, 7, 8] } })
     .populate({
       path: 'sinhVien1 sinhVien2 giangVien',
       select: 'maSo hoTen email lop',

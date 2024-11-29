@@ -11,9 +11,9 @@ const loiMoiSchema = new mongoose.Schema({
   noiDung: { type: String, trim: true },
 });
 const sinhVienSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.ObjectId, ref: 'users' },
+  userId: { type: mongoose.Schema.ObjectId, ref: 'users' }, //Sử dụng ObjectID để liên kết tới collections users .
   doAn: { type: mongoose.Schema.ObjectId, ref: 'doAns', default: null },
-  loiMoi: [loiMoiSchema],
+  loiMoi: [loiMoiSchema], // nhưng thông tin lời mời từ schema lời mời vào trực tiếp schema sinh viên
   soLuongLoiMoi: { type: Number, default: 0 },
   thucTap: {
     type: mongoose.Schema.Types.ObjectId, // Ensure it's ObjectId, not Number
