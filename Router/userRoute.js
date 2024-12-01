@@ -22,7 +22,7 @@ userRouter
   .post(authController.restrictTo(3, 4), userController.insertMany);
 userRouter
   .route('/giangVien')
-  .get(authController.restrictTo(4), userController.layDanhSachGiangVien)
+  .get(authController.restrictTo(3, 4), userController.layDanhSachGiangVien)
   .post(authController.restrictTo(4), userController.taoMotGiangVien);
 userRouter
   .route('/NhieuSinhVien')
