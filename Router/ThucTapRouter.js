@@ -7,14 +7,20 @@ const thucTapRouter = express.Router();
 thucTapRouter.use(authController.protect);
 thucTapRouter
   .route('/')
-  .get(thucTapController.getAllThucTap)
+  .get(authController.restrictTo(1, 2, 3, 4), thucTapController.getAllThucTap)
   .post(thucTapController.taoNoiDungThucTap);
 thucTapRouter
   .route('/DanhSachThucTap/GiangVien')
-  .get(thucTapController.getDanhSachThucTapTheoGiangVien);
+  .get(
+    authController.restrictTo(1, 2, 3, 4),
+    thucTapController.getDanhSachThucTapTheoGiangVien,
+  );
 thucTapRouter
   .route('/GiangVienGiamSat')
-  .post(thucTapController.phanCongGiangVienGiamSat);
+  .post(
+    authController.restrictTo(3),
+    thucTapController.phanCongGiangVienGiamSat,
+  );
 thucTapRouter.route('/:id/comment').post(thucTapController.themComment);
 thucTapRouter.route('/:id/taiLieu').post(thucTapController.taiTaiLieu);
 thucTapRouter

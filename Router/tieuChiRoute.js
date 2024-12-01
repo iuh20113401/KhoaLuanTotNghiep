@@ -5,36 +5,37 @@ const authController = require('../controller/authController');
 const tieuChiRouter = express.Router();
 
 tieuChiRouter.use(authController.protect);
+
 tieuChiRouter
   .route('/')
   .get(tieuChiController.getAllTieuChi)
-  .post(tieuChiController.taoTieuChi);
+  .post(authController.restrictTo(2), tieuChiController.taoTieuChi);
 tieuChiRouter
   .route('/TieuChiDoAn')
   .get(tieuChiController.getTieuChiDoAn)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 tieuChiRouter
   .route('/huongDan')
   .get(tieuChiController.getTieuChiHuongDan)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 tieuChiRouter
   .route('/PhanBien')
   .get(tieuChiController.getTieuChiPhanBien)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 tieuChiRouter
   .route('/hoiDong')
   .get(tieuChiController.getTieuChi)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 tieuChiRouter
   .route('/thucTap/GiangVien')
   .get(tieuChiController.getTieuChiThucTapGiangVien)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 tieuChiRouter
   .route('/thucTap/DoanhNghiep')
   .get(tieuChiController.getTieuChiThucTapChoDoanhNghiep)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 tieuChiRouter
   .route('/:id')
   .get(tieuChiController.getTieuChi)
-  .patch(tieuChiController.updateTieuChi);
+  .patch(authController.restrictTo(2), tieuChiController.updateTieuChi);
 module.exports = tieuChiRouter;

@@ -7,22 +7,40 @@ const sinhVienRouter = express.Router();
 sinhVienRouter.use(authController.protect);
 sinhVienRouter
   .route('/DanhSachSinhVien/GiangVien')
-  .get(sinhVienController.getSinhVienDoAnTheoGiangVien);
+  .get(
+    authController.restrictTo(1, 2, 3, 4),
+    sinhVienController.getSinhVienDoAnTheoGiangVien,
+  );
 sinhVienRouter
   .route('/DanhSachSinhVienThucTap/GiangVien')
-  .get(sinhVienController.getSinhVienThucTapTheoGiangVien);
+  .get(
+    authController.restrictTo(1, 2, 3, 4),
+    sinhVienController.getSinhVienThucTapTheoGiangVien,
+  );
 sinhVienRouter
   .route('/DanhSachSinhVien/ToanBo')
-  .get(sinhVienController.getAllThongTinSinhVien);
+  .get(
+    authController.restrictTo(1, 2, 3, 4),
+    sinhVienController.getAllThongTinSinhVien,
+  );
 sinhVienRouter
   .route('/:id/diemHuongDan')
-  .patch(sinhVienController.updateDiemHuongDan);
+  .patch(
+    authController.restrictTo(1, 2, 3, 4),
+    sinhVienController.updateDiemHuongDan,
+  );
 sinhVienRouter
   .route('/:id/diemThucTap')
-  .patch(sinhVienController.updateDiemThucTap);
+  .patch(
+    authController.restrictTo(1, 2, 3, 4),
+    sinhVienController.updateDiemThucTap,
+  );
 sinhVienRouter
   .route('/:id/LoiMoi')
   .post(sinhVienController.guiLoiMoi)
-  .patch(sinhVienController.updateDiemThucTap);
+  .patch(
+    authController.restrictTo(1, 2, 3, 4),
+    sinhVienController.updateDiemThucTap,
+  );
 sinhVienRouter.route('/:id').get(sinhVienController.getSinhVien);
 module.exports = sinhVienRouter;

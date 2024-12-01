@@ -14,12 +14,18 @@ doAnRouter
 
 doAnRouter
   .route('/DanhSachDoAn/DatCuoiKy')
-  .get(doAnController.getDanhSachDoAnDatCuoiKy)
-  .post(doAnController.themNhieuGiangVienPhanBien);
+  .get(
+    authController.restrictTo(1, 2, 3, 4),
+    doAnController.getDanhSachDoAnDatCuoiKy,
+  )
+  .post(
+    authController.restrictTo(3),
+    doAnController.themNhieuGiangVienPhanBien,
+  );
 doAnRouter
   .route('/DanhSachDoAn/DatPhanBien')
   .get(doAnController.getDanhSachDoAnDatPhanBien)
-  .post(doAnController.themNhieuGiangVienHoiDong);
+  .post(authController.restrictTo(3), doAnController.themNhieuGiangVienHoiDong);
 doAnRouter
   .route('/DanhSachDoAn/PhanBien')
   .get(doAnController.getDanhSachDoAnPhanBien);

@@ -7,11 +7,19 @@ const caiDatRouter = express.Router();
 caiDatRouter.route('/').get(caiDatController.get);
 caiDatRouter
   .route('/dangKyDeTai')
-  .patch(authController.protect, caiDatController.capNhatDangKyDeTai);
+  .patch(
+    authController.protect,
+    authController.restrictTo(3, 4),
+    caiDatController.capNhatDangKyDeTai,
+  );
 
 caiDatRouter
   .route('/dangKyThucTap')
-  .patch(authController.protect, caiDatController.capNhatDangKyThucTap);
+  .patch(
+    authController.protect,
+    authController.restrictTo(3, 4),
+    caiDatController.capNhatDangKyThucTap,
+  );
 
 caiDatRouter
   .route('/resetDeTai')

@@ -8,6 +8,6 @@ hoiDongRouter.use(authController.protect);
 hoiDongRouter
   .route('/')
   .get(hoiDongController.layDanhSachHoiDong)
-  .post(hoiDongController.taoHoiDong);
+  .post(authController.restrictTo(3), hoiDongController.taoHoiDong);
 
 module.exports = hoiDongRouter;
