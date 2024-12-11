@@ -44,8 +44,9 @@ const doAnSchema = mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'users',
       require: [true, 'Đồ án phải có sinh viên'],
+      unique: true,
     },
-    sinhVien2: { type: mongoose.Schema.ObjectId, ref: 'users' },
+    sinhVien2: { type: mongoose.Schema.ObjectId, ref: 'users', unique: true },
     ngayThamGia: { type: Date, default: Date.now() },
     trangThai: { type: Number, default: 0 },
     comment: [
@@ -158,6 +159,25 @@ doAnSchema.virtual('sinhVien2Info', {
   select: 'thucTap doAn diem -_id',
   justOne: true,
 });
+doAnSchema.path('sinhVien1').validate(async function (value) {
+  const existing = await mongoose.models.doAn.findOne({
+    $or: [{ sinhVien1: value }, { sinhVien2: value }],
+    _id: { $ne: this._id }, // Exclude the current document
+  });
+  return !existing; // Validation passes if no existing document is found
+}, 'Sinh viên này đã tham gia đồ án khác.');
+
+// Add custom validation for sinhVien2
+doAnSchema.path('sinhVien2').validate(async function (value) {
+  if (!value) return true; // Allow null or undefined for sinhVien2
+  const existing = await mongoose.models.doAn.findOne({
+    $or: [{ sinhVien1: value }, { sinhVien2: value }],
+    _id: { $ne: this._id }, // Exclude the current document
+  });
+  return !existing; // Validation passes if no existing document is found
+}, 'Sinh viên này đã tham gia đồ án khác.');
+
+//
 doAnSchema.pre('find', function (next) {
   this.wasNew = this.isNew;
   next();
