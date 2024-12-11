@@ -87,11 +87,13 @@ exports.getDanhSachDeTaiDanhKy = catchAsync(async (req, res, next) => {
 });
 exports.duyetDeTai = catchAsync(async (req, res, next) => {
   // Fetch the deTai document by ID
-  const result = await deTai.findById(req.params.id).populate('giangVien');
+  const result = await deTai
+    .findById(req.params.id)
+    .populate('giangVien sinhVien');
   if (!result) {
     return next(new AppError('No deTai found with that ID', 404));
   }
-
+  console.log(result);
   // Update trangThai
   result.trangThai = 1;
 

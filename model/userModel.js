@@ -138,11 +138,6 @@ userSchema.post('bulkWrite', async (docs, next) => {
   next();
 });
 
-userSchema.pre(/^find/, function (next) {
-  // this points to the current query
-  this.select('-password');
-  next();
-});
 userSchema.post('save', async (doc, next) => {
   if (doc.vaiTro === 0) {
     await SinhVien.create({
