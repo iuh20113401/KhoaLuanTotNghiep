@@ -237,8 +237,6 @@ exports.getDoAn = Factory.getOne(doAn, [
 exports.deleteDoAn = Factory.deleteOne(doAn);
 
 exports.taoDoAn = catchAsync(async (req, res, next) => {
-  let caiDatInfo = await caiDat.find();
-  caiDatInfo = caiDatInfo[0];
   const result = await doAn.create({ ...req.body, sinhVien1: req.user._id });
   res.status(201).json({
     status: 'success',

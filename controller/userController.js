@@ -176,7 +176,7 @@ exports.layDanhSachGiangVien = catchAsync(async (req, res) => {
   )
     .filter()
     .sort('maSo')
-    .fields()
+    .fields(' -__v -boMon -khoa')
     .panigation();
   const { query, totalDocs } = feature;
   const danhSachGiangVien = await query.select('-__v');

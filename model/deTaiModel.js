@@ -10,6 +10,7 @@ const deTaiSchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'users',
   },
+  sinhVien: { type: mongoose.Schema.ObjectId, ref: 'users' },
   moTa: {
     type: String,
     trim: true,
@@ -34,12 +35,13 @@ const deTaiSchema = mongoose.Schema({
   },
   tag: [String],
   ghiChu: { type: String, trim: true },
-  trangThai: { type: Number, default: 0 },
+  trangThai: { type: Number, default: 0 }, // 0 cho chưa duyệt, 1 cho đã duyệt, 2 cho chỉnh sửa, 3 là cho không duyệt và 4 là cho sinh viên đã tạo
   danhMuc: {
     type: String,
     trim: true,
     required: [true, 'Đề tài phải thuộc một danh mục cụ thể'],
   },
+  loai: { type: Number, default: 0 }, // 0 cho giảng viên và 1 cho sinh viên
 });
 
 const deTai = mongoose.model('deTais', deTaiSchema);
