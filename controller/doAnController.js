@@ -1514,7 +1514,7 @@ exports.getDanhSachDoAnKhongDatPhanBien = catchAsync(async (req, res, next) => {
 });
 exports.themNhieuGiangVienHoiDong = catchAsync(async (req, res, next) => {
   const bulkOperations = req.body.map((doAnData) => {
-    const { _id, loai, giangVien } = doAnData;
+    const { _id, loai, stt, giangVien } = doAnData;
 
     return {
       updateOne: {
@@ -1523,6 +1523,7 @@ exports.themNhieuGiangVienHoiDong = catchAsync(async (req, res, next) => {
           $set: {
             giangVienHoiDong: {
               loai: loai,
+              stt: stt,
               giangVien,
             },
             trangThai: loai === 1 ? 3 : 4,

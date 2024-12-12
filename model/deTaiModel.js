@@ -34,7 +34,12 @@ const deTaiSchema = mongoose.Schema({
     type: String,
   },
   tag: [String],
-  ghiChu: { type: String, trim: true },
+  ghiChu: [
+    {
+      noiDung: { type: String, trim: true },
+      ngayTao: { type: Date, default: new Date() },
+    },
+  ],
   trangThai: { type: Number, default: 0 }, // 0 cho chưa duyệt, 1 cho đã duyệt, 2 cho chỉnh sửa, 3 là cho không duyệt và 4 là cho sinh viên đã tạo
   danhMuc: {
     type: String,

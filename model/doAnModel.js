@@ -32,6 +32,7 @@ const doAnSchema = mongoose.Schema(
     },
     giangVienHoiDong: {
       loai: Number,
+      stt: Number,
       giangVien: [
         {
           userId: { type: mongoose.Schema.ObjectId, ref: 'users' },

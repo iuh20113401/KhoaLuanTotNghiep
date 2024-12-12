@@ -20,6 +20,12 @@ deTaiRouter
     authController.restrictTo(1, 2, 3, 4),
     deTaiController.getDanhSachDeTaiChoDuyet,
   );
+deTaiRouter
+  .route('/DanhSachDeTai/SinhVien')
+  .get(
+    authController.restrictTo(1, 2, 3, 4),
+    deTaiController.getDanhSachDeTaiSinhVienDangKy,
+  );
 //lấy danh sách đề tài với trạng thái là 1 (chờ đăng ký) cho giảng viên
 
 deTaiRouter
@@ -35,6 +41,9 @@ deTaiRouter
 deTaiRouter
   .route('/duyetdetai/:id')
   .patch(authController.restrictTo(3), deTaiController.duyetDeTai);
+deTaiRouter
+  .route('/yeuCauChinhSua/:id')
+  .patch(authController.restrictTo(3), deTaiController.yeuCauChinhSua);
 deTaiRouter
   .route('/:id')
   .get(deTaiController.getDeTai)

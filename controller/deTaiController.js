@@ -64,10 +64,36 @@ exports.getDanhSachDeTaiDaDuyet = catchAsync(async (req, res, next) => {
   });
 });
 exports.getDanhSachDeTaiChoDuyet = catchAsync(async (req, res, next) => {
-  const DanhSachDeTai = await deTai.find({ trangThai: 0 }).populate({
-    path: 'giangVien',
-    select: 'maSo hoTen email soDienThoai',
+  const DanhSachDeTai = await deTai
+    .find({ trangThai: 0, sinhVien: null })
+    .populate({
+      path: 'giangVien',
+      select: 'maSo hoTen email soDienThoai',
+    });
+  res.status(200).json({
+    status: 'success',
+    data: { DanhSachDeTai },
   });
+});
+exports.getDanhSachDeTaiSinhVienDangKy = catchAsync(async (req, res, next) => {
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const DanhSachDeTai = await deTai
+    .find({
+      $and: [
+        { sinhVien: { $ne: null } },
+        {
+          $or: [
+            { trangThai: { $in: [0] } },
+            { trangThai: 4, ngayTao: { $lt: threeDaysAgo } },
+          ],
+        },
+      ],
+    })
+    .populate({
+      path: 'giangVien sinhVien',
+      select: 'maSo hoTen email soDienThoai',
+    });
   res.status(200).json({
     status: 'success',
     data: { DanhSachDeTai },
@@ -85,6 +111,15 @@ exports.getDanhSachDeTaiDanhKy = catchAsync(async (req, res, next) => {
     data: { DanhSachDeTai },
   });
 });
+exports.yeuCauChinhSua = catchAsync(async (req, res, next) => {
+  const result = await deTai.findByIdAndUpdate(req.params.id, {
+    $push: { ghiChu: req.body },
+  });
+  console.log(req.params.id, req.body);
+  return res.status(200).json({
+    status: 'success',
+  });
+});
 exports.duyetDeTai = catchAsync(async (req, res, next) => {
   // Fetch the deTai document by ID
   const result = await deTai
@@ -93,7 +128,6 @@ exports.duyetDeTai = catchAsync(async (req, res, next) => {
   if (!result) {
     return next(new AppError('No deTai found with that ID', 404));
   }
-  console.log(result);
   // Update trangThai
   result.trangThai = 1;
 
