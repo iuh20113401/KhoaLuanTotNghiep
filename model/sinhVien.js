@@ -52,6 +52,7 @@ const sinhVienSchema = new mongoose.Schema({
         type: Number,
         default: null,
       },
+      nhanXet: { type: String, default: '' },
     },
     diemPhanBien: {
       diemPhanBien1: {
@@ -71,6 +72,7 @@ const sinhVienSchema = new mongoose.Schema({
           type: Number,
           default: 0,
         },
+        nhanXet: { type: String, default: '' },
       },
       diemPhanBien2: {
         diemAbet: [
@@ -89,6 +91,7 @@ const sinhVienSchema = new mongoose.Schema({
           type: Number,
           default: 0,
         },
+        nhanXet: { type: String, default: '' },
       },
     },
     diemHoiDong: {
@@ -109,6 +112,7 @@ const sinhVienSchema = new mongoose.Schema({
           type: Number,
           default: 0,
         },
+        nhanXet: { type: String, default: '' },
       },
       diemHoiDong2: {
         diemAbet: [
@@ -127,6 +131,7 @@ const sinhVienSchema = new mongoose.Schema({
           type: Number,
           default: 0,
         },
+        nhanXet: { type: String, default: '' },
       },
       diemHoiDong3: {
         diemAbet: [
@@ -145,6 +150,7 @@ const sinhVienSchema = new mongoose.Schema({
           type: Number,
           default: 0,
         },
+        nhanXet: { type: String, default: '' },
       },
     },
     diemThucTap: {
