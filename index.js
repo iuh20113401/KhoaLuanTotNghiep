@@ -102,6 +102,5 @@ app.use('/api/caiDat', caiDatRouter);
 app.use('/api/hoiDong', hoiDongRouter);
 
 app.use(errorController);
-module.exports = app;
 app.use('/.netlify/functions/app', router);
 module.exports.handler = serverless(app);
