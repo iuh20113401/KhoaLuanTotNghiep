@@ -45,9 +45,8 @@ const doAnSchema = mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'users',
       require: [true, 'Đồ án phải có sinh viên'],
-      unique: true,
     },
-    sinhVien2: { type: mongoose.Schema.ObjectId, ref: 'users', unique: true },
+    sinhVien2: { type: mongoose.Schema.ObjectId, ref: 'users' },
     ngayThamGia: { type: Date, default: Date.now() },
     trangThai: { type: Number, default: 0 },
     comment: [
@@ -161,6 +160,8 @@ doAnSchema.virtual('sinhVien2Info', {
   justOne: true,
 });
 doAnSchema.path('sinhVien1').validate(async function (value) {
+  if (!value) return true; // Allow null or undefined for sinhVien2
+
   const existing = await mongoose.models.doAn.findOne({
     $or: [{ sinhVien1: value }, { sinhVien2: value }],
     _id: { $ne: this._id }, // Exclude the current document

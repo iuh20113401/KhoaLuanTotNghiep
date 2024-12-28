@@ -343,7 +343,7 @@ exports.insertMany = catchAsync(async (req, res, next) => {
         .status(400)
         .json({ error: 'Không tìm thấy tiêu đề hợp lệ trong tệp Excel.' });
     }
-    const header = jsonData[0];
+    const header = jsonData[headerRowIndex];
     const maSoIndex = header.findIndex((row) => row === 'Mã SV');
     const hoIndex = header.findIndex((row) => row === 'Họ đệm');
     const tenIndex = header.findIndex((row) => row === 'Tên');
@@ -409,7 +409,6 @@ exports.insertMany = catchAsync(async (req, res, next) => {
         upsert: true,
       },
     }));
-
     await User.bulkWrite(bulkOps);
 
     fs.unlinkSync(filePath); // Remove file after processing

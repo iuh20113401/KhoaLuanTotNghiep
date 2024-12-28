@@ -411,28 +411,12 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
           hoTen: '$user1Info.hoTen',
         },
         sinhVien2: {
-          $cond: {
-            if: {
-              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
-            },
-            then: {
-              maSo: '$user2Info.maSo',
-              hoTen: '$user2Info.hoTen',
-            },
-            else: '$$REMOVE',
-          },
+          maSo: '$user2Info.maSo',
+          hoTen: '$user2Info.hoTen',
         },
         sinhVien2Info: {
-          $cond: {
-            if: {
-              $or: [{ $eq: ['$user2Info', null] }, { $eq: ['$user2Info', {}] }],
-            }, // Check if sinhVien2Info is not null
-            then: {
-              sinhVienId: '$sinhVien2Info._id',
-              diem: '$sinhVien2Info.diem',
-            },
-            else: '$$REMOVE',
-          },
+          sinhVienId: '$sinhVien2Info._id',
+          diem: '$sinhVien2Info.diem',
         },
         huongDan: 1,
         totalHuongDan: 1,
@@ -452,7 +436,6 @@ exports.getDanhSachDoAnTheoGiangVien = catchAsync(async (req, res, next) => {
       },
     },
   ]);
-
   res.status(200).json({
     status: 'success',
     data: {

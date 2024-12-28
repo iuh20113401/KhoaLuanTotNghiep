@@ -1,4 +1,5 @@
 const path = require('path');
+const serverless = require('serverless-http');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -9,6 +10,7 @@ const hpp = require('hpp');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
+const router = express.Router();
 const app = express();
 const userRouter = require('./Router/userRoute');
 const errorController = require('./controller/errorController');
@@ -98,3 +100,5 @@ app.use('/api/hoiDong', hoiDongRouter);
 
 app.use(errorController);
 module.exports = app;
+app.use('/.netlify/functions/app', router);
+module.exports.handler = serverless(app);
