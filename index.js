@@ -83,6 +83,9 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 app.use('/public', express.static(path.join(__dirname, '/public')));
 // use Router
+router.get('/', (req, res) => {
+  res.send('App is running..');
+});
 app.use('/api/user', userRouter);
 app.use('/api/deTai', deTaiRouter);
 app.use('/api/doAn', doAnRouter);
