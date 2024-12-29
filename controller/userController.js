@@ -2,7 +2,7 @@ const xlsx = require('xlsx');
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const SinhVien = require('../model/sinhVien');
 const User = require('../model/userModel');

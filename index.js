@@ -80,27 +80,33 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
-app.use('/public', express.static(path.join(__dirname, '/public')));
+app.use(
+  '/.netlify/functions/server/uploads',
+  express.static(path.join(__dirname, '/uploads')),
+);
+app.use(
+  '/.netlify/functions/server/public',
+  express.static(path.join(__dirname, '/public')),
+);
 // use Router
 router.get('/', (req, res) => {
   res.send('App is running..');
 });
-app.use('/api/user', userRouter);
-app.use('/api/deTai', deTaiRouter);
-app.use('/api/doAn', doAnRouter);
-app.use('/api/thucTap', thucTapRouter);
-app.use('/api/sinhVien', sinhVienRouter);
-app.use('/api/tieuChi', tieuChiRouter);
-app.use('/api/bieuMauChung', bieuMauChungRouter);
-app.use('/api/maDiemDanh', diemDanhRouter);
-app.use('/api/chat', chatRouter);
-app.use('/api/thongBao', thongBaoRouter);
-app.use('/api/lichHop', lichHopRouter);
-app.use('/api/dashboard', dashboardRouter);
-app.use('/api/caiDat', caiDatRouter);
-app.use('/api/hoiDong', hoiDongRouter);
+app.use('/.netlify/functions/server/api/user', userRouter);
+app.use('/.netlify/functions/server/api/deTai', deTaiRouter);
+app.use('/.netlify/functions/server/api/doAn', doAnRouter);
+app.use('/.netlify/functions/server/api/thucTap', thucTapRouter);
+app.use('/.netlify/functions/server/api/sinhVien', sinhVienRouter);
+app.use('/.netlify/functions/server/api/tieuChi', tieuChiRouter);
+app.use('/.netlify/functions/server/api/bieuMauChung', bieuMauChungRouter);
+app.use('/.netlify/functions/server/api/maDiemDanh', diemDanhRouter);
+app.use('/.netlify/functions/server/api/chat', chatRouter);
+app.use('/.netlify/functions/server/api/thongBao', thongBaoRouter);
+app.use('/.netlify/functions/server/api/lichHop', lichHopRouter);
+app.use('/.netlify/functions/server/api/dashboard', dashboardRouter);
+app.use('/.netlify/functions/server/api/caiDat', caiDatRouter);
+app.use('/.netlify/functions/server/api/hoiDong', hoiDongRouter);
 
 app.use(errorController);
-app.use('/.netlify/functions/app', router);
-module.exports.handler = serverless(app);
+app.use('/.netlify/functions/server', router);
+module.exports = app;
